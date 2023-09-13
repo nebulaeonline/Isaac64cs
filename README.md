@@ -10,6 +10,25 @@ Create an instance of the Isaac64.Rng() class, it has 3 constructors: (1) constr
 a new RNG from a UInt64 number, (2) from a UInt64 array, and (3) from a byte array
 containing up to 2048 bytes.
 
+There are RandN() & RangedRandN() methods for 64/32/16/8 bit unsigned integers.
+The RandN() methods can tax a Max argument (of the same type), while the 
+RangedRandN() methods take a Min and a Max and will return a number between
+those specified.
+
+There is a Shuffle() method that will mix & rotate the data and fill back
+up the RNG.  It does it after every 256 64-bit numbers (that's the
+capacity), but if you have a need to do it more frequently the option is
+there.
+
+You can also Reseed() the RNG from ground zero at any time, and the Reseed()
+method comes in the same varieties as the constructors.
+
+I have not gone hog wild with managing the rng data.  If you pull a smaller
+data type than 64-bits (8 bytes), the remaining pieces are banked and saved
+until you call that data type again.  This is just a first go at getting a
+conforming implementation working so I can move on to what I was really 
+trying to do.
+
 This code is not as optimized and featureful as it could be, but it is at least
 correct (unless there are some edge cases).  So many repos have flat-out wrong
 implementations, and I'm not sure if it's intentional, or just people getting

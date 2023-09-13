@@ -21,7 +21,7 @@ capacity), but if you have a need to do it more frequently the option is
 there.
 
 You can also Reseed() the RNG from ground zero at any time, and the Reseed()
-method comes in the same varieties as the constructors.
+methods come in the same varieties as the constructors.
 
 I have not gone hog wild with managing the rng data.  If you pull a smaller
 data type than 64-bits (8 bytes), the remaining pieces are banked and saved

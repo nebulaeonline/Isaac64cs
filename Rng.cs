@@ -310,7 +310,7 @@
  * 
  * Expected outputs from Rust core lib: https://docs.rs/rand_isaac/latest/src/rand_isaac/isaac64.rs.html
  *   - This version matches the expected outputs with the keys provided by the Rust team for 64-bit and 
- *     32-bit unsigned ints, both seeded and unseeded (see below).  Also matches Rust's 10,000k ignore
+ *     32-bit unsigned ints, both seeded and unseeded (see below).  Also matches Rust's 10k ignore
  *     test and verify on 10,001st 64-bit rng pull with seeded input.
  *     
  * Expected outputs from Zig std library: https://github.com/ziglang/zig/blob/master/lib/std/rand/Isaac64.zig

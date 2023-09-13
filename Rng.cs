@@ -2,6 +2,33 @@
 {
     public class Rng
     {
+        private static readonly int LOG2_ISSAC64_SZ = 8;
+        private static readonly int ISAAC64_SZ = (int)(1 << LOG2_ISSAC64_SZ);
+        private static readonly int ISAAC64_SEED_SZ_MAX = (ISAAC64_SZ << 3);
+        private static readonly ulong IND_MASK = (ulong)(((ISAAC64_SZ) - 1) << 3);
+        private static readonly ulong MAGIC = 0x9E3779B97F4A7C13;
+        private static readonly ulong HIGH32 = 0xFFFF_FFFF_0000_0000;
+        private static readonly ulong LOW32 = 0x0000_0000_FFFF_FFFF;
+        private static readonly int[] MIX_SHIFT = { 9, 9, 23, 15, 14, 20, 17, 14 };
+
+        private class Context
+        {
+            internal ulong[] rng_buf = new ulong[ISAAC64_SZ];       // randrsl
+            internal ulong[] rng_state = new ulong[ISAAC64_SZ];     // mm
+            internal ulong aa, bb, cc;
+            internal int rng_count;                                 // randcnt
+            internal uint banked32 = 0;
+            internal Stack<ushort> banked16 = new Stack<ushort>();
+            internal Stack<Byte> banked8 = new Stack<Byte>();
+        }
+
+        private Context ctx = new Context();
+
+        public Rng()
+        {
+            Reseed(0);
+        }
+        
         public Rng(ulong NumericSeed)
         {
             Reseed(NumericSeed);
@@ -16,29 +43,6 @@
         {
             Reseed(SeedULongs);
         }
-
-        private class Context
-        {
-            internal ulong[] rng_buf = new ulong[ISAAC64_SZ];       // randrsl
-            internal ulong[] rng_state = new ulong[ISAAC64_SZ];     // mm
-            internal ulong aa, bb, cc;
-            internal int rng_count;                                 // randcnt
-            internal uint banked32 = 0;
-            internal Stack<ushort> banked16 = new Stack<ushort>();
-            internal Stack<Byte> banked8 = new Stack<Byte>();
-        }
-
-        private static readonly int LOG2_ISSAC64_SZ = 8;
-        private static readonly int ISAAC64_SZ = (int)(1 << LOG2_ISSAC64_SZ);
-        private static readonly int ISAAC64_SEED_SZ_MAX = (ISAAC64_SZ << 3);
-        private static readonly ulong IND_MASK = (ulong)(((ISAAC64_SZ) - 1) << 3);
-        private static readonly ulong MAGIC = 0x9E3779B97F4A7C13;
-        private static readonly ulong HIGH32 = 0xFFFF_FFFF_0000_0000;
-        private static readonly ulong LOW32 = 0x0000_0000_FFFF_FFFF;
-        private static readonly int[] MIX_SHIFT = { 9, 9, 23, 15, 14, 20, 17, 14 };
-                
-        private static Context ctx = new Context();
-
 
         // state_idx1 -> m  - first index into rng_state
         // state_idx2 -> m2 - second index into rng_state
@@ -122,9 +126,7 @@
             ctx.aa = ctx.bb = ctx.cc = 0;
 
             for (i = 0; i < 4; i++)
-            {
                 mix(ref x);
-            }
 
             for (i = 0; i < ISAAC64_SZ; i += 8)
             {
@@ -229,8 +231,7 @@
         {
             var range_count = Math.Max(Min, Max) - Math.Min(Min, Max) + 1;
             var rnum = Rand64(range_count);
-            var rangenum = rnum + Math.Min(Min, Max);
-            return rangenum;
+            return rnum + Math.Min(Min, Max);
         }
 
         public uint Rand32(uint Max = 0)
@@ -252,8 +253,7 @@
         {
             var range_count = Math.Max(Min, Max) - Math.Min(Min, Max) + 1;
             var rnum = Rand32(range_count);
-            var rangenum = rnum + Math.Min(Min, Max);
-            return rangenum;
+            return rnum + Math.Min(Min, Max);
         }
 
         public ushort Rand16(ushort Max = 0)
@@ -266,9 +266,9 @@
             if (ctx.banked16.Count > 0) { ctx.rng_count++; return ctx.banked16.Pop(); }
 
             r = Convert.ToUInt16(ctx.rng_buf[ctx.rng_count] & 0x0000_0000_0000_FFFF);
-            ctx.banked16.Push(Convert.ToUInt16((ctx.rng_buf[ctx.rng_count] & 0xFFFF_0000_0000_0000) >> 48));
-            ctx.banked16.Push(Convert.ToUInt16((ctx.rng_buf[ctx.rng_count] & 0x0000_FFFF_0000_0000) >> 32));
-            ctx.banked16.Push(Convert.ToUInt16((ctx.rng_buf[ctx.rng_count] & 0x0000_0000_FFFF_0000) >> 16));
+
+            for (int i = 0; i < 3; i++)
+                ctx.banked16.Push(Convert.ToByte((ctx.rng_buf[ctx.rng_count] & (ulong)(0xFFFF << ((i + 1) * 16)) >> ((i + 1) * 16))));
 
             return (Max == 0) ? r : (ushort)((uint)r % (uint)Max);
         }
@@ -277,8 +277,7 @@
         {
             ushort range_count = (ushort)(Math.Max(Min, Max) - Math.Min(Min, Max) + 1);
             ushort rnum = Rand16(range_count);
-            ushort rangenum = (ushort)((uint)rnum + Math.Min(Min, Max));
-            return rangenum;
+            return (ushort)((uint)rnum + Math.Min(Min, Max));
         }
 
         public Byte Rand8(Byte Max = 0)
@@ -291,13 +290,9 @@
             if (ctx.banked8.Count > 0) { ctx.rng_count++; return ctx.banked8.Pop(); }
 
             r = Convert.ToByte(ctx.rng_buf[ctx.rng_count] & 0x0000_0000_0000_00FF);
-            ctx.banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rng_count] & 0xFF00_0000_0000_0000) >> 56));
-            ctx.banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rng_count] & 0x00FF_0000_0000_0000) >> 48));
-            ctx.banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rng_count] & 0x0000_FF00_0000_0000) >> 40));
-            ctx.banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rng_count] & 0x0000_00FF_0000_0000) >> 32));
-            ctx.banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rng_count] & 0x0000_0000_FF00_0000) >> 24));
-            ctx.banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rng_count] & 0x0000_0000_00FF_0000) >> 16));
-            ctx.banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rng_count] & 0x0000_0000_0000_FF00) >> 8));
+            
+            for (int i = 0; i < 7; i++)
+                ctx.banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rng_count] & (ulong)(0xFF << ((i + 1) * 8)) >> ((i + 1) * 8))));
 
             return (Max == 0) ? r : (Byte)((uint)r % (uint)Max);
         }
@@ -306,8 +301,7 @@
         {
             Byte range_count = (Byte)(Math.Max(Min, Max) - Math.Min(Min, Max) + 1);
             Byte rnum = Rand8(range_count);
-            Byte rangenum = (Byte)((uint)rnum + Math.Min(Min, Max));
-            return rangenum;
+            return (Byte)((uint)rnum + Math.Min(Min, Max));
         }
     }
 }
@@ -315,8 +309,10 @@
 /* Reference implementation from Bob Jenkins: https://burtleburtle.net/bob/rand/isaacafa.html
  * 
  * Expected outputs from Rust core lib: https://docs.rs/rand_isaac/latest/src/rand_isaac/isaac64.rs.html
- *   - This version matches the expected outputs with the keys provided by the Rust team for 64-bit unsigned ints
- *   
+ *   - This version matches the expected outputs with the keys provided by the Rust team for 64-bit and 
+ *     32-bit unsigned ints, both seeded and unseeded (see below).  Also matches Rust's 10,000k ignore
+ *     test and verify on 10,001st 64-bit rng pull with seeded input.
+ *     
  * Expected outputs from Zig std library: https://github.com/ziglang/zig/blob/master/lib/std/rand/Isaac64.zig
  *   - Zig std code provides the same output as below
  *   

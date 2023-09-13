@@ -11,7 +11,7 @@ a new RNG from a UInt64 number, (2) from a UInt64 array, and (3) from a byte arr
 containing up to 2048 bytes.
 
 There are RandN() & RangedRandN() methods for 64/32/16/8 bit unsigned integers.
-The RandN() methods can tax a Max argument (of the same type), while the 
+The RandN() methods can take a Max argument (of the same type), while the 
 RangedRandN() methods take a Min and a Max and will return a number between
 those specified.
 

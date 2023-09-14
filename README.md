@@ -30,9 +30,7 @@ conforming implementation working so I can move on to what I was really
 trying to do.
 
 This code is not as optimized and featureful as it could be, but it is at least
-correct (unless there are some edge cases).  So many repos have flat-out wrong
-implementations, and I'm not sure if it's intentional, or just people getting
-their feet wet.
+correct (unless there are some edge cases).
 
 As for conformance, I have checked this again Bob Jenkins' original C reference
 implementation here: https://burtleburtle.net/bob/rand/isaacafa.html

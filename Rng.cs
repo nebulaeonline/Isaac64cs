@@ -691,6 +691,8 @@ namespace Isaac64
                 throw new Exception("You cannot mix subnormal and normal doubles for Min & Max!");
 
             // Swap Min, Max if necessary
+            // Easier to reason about if we know
+            // d1 <= d2 ALWAYS
             if (Min > Max) (Min, Max) = (Max, Min);
 
             // Adjust MinZero if dealing with subnormals
@@ -709,11 +711,8 @@ namespace Isaac64
             }
                         
             Dub mz = new Dub(MinZero);
-
-            // Easier to reason about if we know
-            // d1 <= d2 ALWAYS
-            Dub d1 = new Dub(Math.Min(Min, Max));
-            Dub d2 = new Dub(Math.Max(Min, Max));
+            Dub d1 = new Dub(Min);
+            Dub d2 = new Dub(Max);
 
             // First, figure out what our sign is going to be
             // ->both ++ then +, both -- then -, one of each then random

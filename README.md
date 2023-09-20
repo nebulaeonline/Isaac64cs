@@ -3,11 +3,11 @@
 ISAAC64 Implementation in C#
 
 ---
-NOTE: I intend to remove the use of spans & unsafe very soon.  I know some don't want
-to build with unsafe code. I had intended spans to provide a more granular approach
-when dealing with different data sizes, and some easier-to-follow code when
-banking data types < 64-bit.  It's not ugly, but it just doesn't justify the
-use of unsafe.
+###NOTE: I intend to remove the use of spans & unsafe very soon.  I know some don't want
+###to build with unsafe code. I had intended spans to provide a more granular approach
+###when dealing with different data sizes, and some easier-to-follow code when
+###banking data types < 64-bit.  It's not ugly, but it just doesn't justify the
+###use of unsafe.
 ---
 
 I am a big fan of using Isaac64 here and there in my projects.

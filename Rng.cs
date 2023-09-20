@@ -276,27 +276,28 @@ namespace Isaac64
         {
             int i;
 
-            /* No need to waste the time on every update
-             * 
-             * const ulong MAGIC = 0x9E3779B97F4A7C13;
-             * 
-             * 
-             *      ulong[] x = { MAGIC, MAGIC,
-             *                    MAGIC, MAGIC,
-             *                    MAGIC, MAGIC,
-             *                    MAGIC, MAGIC };
-             *
-             *      ctx.aa = ctx.bb = ctx.cc = 0;
-             *
-             *      for (i = 0; i < 4; i++)
-             *          mix(ref x);
-            */
+            //No need to waste the time on every update
+
+            /*const ulong MAGIC = 0x9E3779B97F4A7C13;
+
+
+           ulong[] x = { MAGIC, MAGIC,
+                         MAGIC, MAGIC,
+                         MAGIC, MAGIC,
+                         MAGIC, MAGIC };
+
+
+
+           for (i = 0; i < 4; i++)
+               mix(ref x);*/
 
             // Save the 4 rounds of mix'ing MAGIC
             ulong[] x = { 0x647c4677a2884b7c, 0xb9f8b322c73ac862,
                           0x8c0ea5053d4712a0, 0xb29b2e824a595524,
                           0x82f053db8355e0ce, 0x48fe4a0fa5a09315,
                           0xae985bf2cbfc89ed, 0x98f5704f6c44c0ab };
+
+            ctx.aa = ctx.bb = ctx.cc = 0;
 
             for (i = 0; i < ISAAC64_SZ_64; i += 8)
             {

@@ -2,14 +2,6 @@
 
 ISAAC64 Implementation in C#
 
----
-###NOTE: I intend to remove the use of spans & unsafe very soon.  I know some don't want
-###to build with unsafe code. I had intended spans to provide a more granular approach
-###when dealing with different data sizes, and some easier-to-follow code when
-###banking data types < 64-bit.  It's not ugly, but it just doesn't justify the
-###use of unsafe.
----
-
 I am a big fan of using Isaac64 here and there in my projects.
 
 This one is made to be super simple:
@@ -34,11 +26,11 @@ double in the range (0, 1); and (3) RandDoubleRaw(), which provides a great
 deal of flexibility in generating doubles within a given range.
 
 The Shuffle() method mixes & rotates the data and fill back up the RNG buffer.  
-It does it after every 256 64-bit numbers (that's the capacity), but if you have 
+It shuffles after every 256 64-bit numbers automatically, but if you have 
 a need to do it more frequently the option is there.
 
 You can also Reseed() the RNG from ground zero at any time, and the Reseed()
-methods come in the same varieties as the non-default constructors.
+methods come in the same varieties as the non-default, non-testing constructors.
 
 If you pull a smaller data type than 64-bits (8 bytes), the remaining pieces 
 of the 8-byte chunk are banked until you request that data size again.

@@ -7,10 +7,10 @@ namespace Isaac64
         // size constants
         private const int ISAAC64_WORD_SZ = 8;
         private const int ISAAC64_SZ_64 = (int)(1 << ISAAC64_WORD_SZ);
-        private const int ISAAC64_SZ_32 = (int)(ISAAC64_SZ_64 << 1);
-        private const int ISAAC64_SZ_16 = (int)(ISAAC64_SZ_32 << 1);
-        private const int ISAAC64_SZ_8  = (int)(ISAAC64_SZ_16 << 1);
+        private const int ISAAC64_SZ_8  = (int)(ISAAC64_SZ_64 << 2);
         private const ulong IND_MASK = (ulong)(((ISAAC64_SZ_64) - 1) << 3);
+        private const ulong HIGH32 = 0xFFFF_FFFF_0000_0000;
+        private const ulong LOW32 = 0x0000_0000_FFFF_FFFF;
 
         // banked randoms
         private Stack<uint> banked32 = new Stack<uint>();
@@ -24,10 +24,10 @@ namespace Isaac64
         private class Context
         {
             // randrsl
-            internal IntPtr _rngbuf = Marshal.AllocHGlobal(ISAAC64_SZ_8);
+            internal ulong[] rng_buf = new ulong[ISAAC64_SZ_64];
 
             // mm
-            internal IntPtr _stbuf = Marshal.AllocHGlobal(ISAAC64_SZ_8);
+            internal ulong[] rng_state = new ulong[ISAAC64_SZ_64];
 
             // aa, bb, cc
             internal ulong aa, bb, cc;
@@ -50,6 +50,17 @@ namespace Isaac64
             var seed = new byte[ISAAC64_SZ_8];
             seed = System.Security.Cryptography.RandomNumberGenerator.GetBytes(ISAAC64_SZ_8);
             Reseed(seed);
+        }
+
+        /// <summary>
+        /// Rng() constructs the rng object and seeds the rng
+        /// This variant of the constructor is for testing
+        /// </summary>
+        /// <param name="Testing">bool Testing - for testing purposes; if false, this will throw</param>
+        /// <returns>the constructed & seeded rng</returns>
+        public Rng(bool Testing)
+        {
+            Reseed(0, true);
         }
 
         /// <summary>
@@ -103,12 +114,6 @@ namespace Isaac64
         /// <returns>none</returns>
         public void Reseed(byte[] Seedbytes, bool IgnoreZeroAndOverSZ8Bytes = false)
         {
-            Span<byte> rng_buf;
-            unsafe
-            {
-                rng_buf = new Span<byte>(ctx._rngbuf.ToPointer(), ISAAC64_SZ_8);
-            }
-
             if (!IgnoreZeroAndOverSZ8Bytes && (Seedbytes.Length > ISAAC64_SZ_8 || Seedbytes.Length == 0))
                 throw new ArgumentException($"Cannot seed ISAAC64 with zero or more than {ISAAC64_SZ_8} bytes! To pass a zero array size or an array size > {ISAAC64_SZ_8}, set IgnoreZeroAndOverSZ8Bytes to true.");
 
@@ -120,11 +125,13 @@ namespace Isaac64
 
             clear_state();
 
-            int sbl = (Seedbytes.Length > ISAAC64_SZ_8) ? ISAAC64_SZ_8 : Seedbytes.Length;
+            for (int i = 0; i < Seedbytes.Length; i++)
+            {
+                if (i % 8 == 0)
+                    ctx.rng_buf[i / 8] = 0;
 
-            for (int i = 0; i < sbl; i++)
-                rng_buf[i] = Seedbytes[i];
-
+                ctx.rng_buf[i / 8] |= ((ulong)Seedbytes[i] << ((i % 8) * 8));
+            }
             init();
         }
 
@@ -136,12 +143,6 @@ namespace Isaac64
         /// <returns>none</returns>
         public void Reseed(ulong[] SeedULongs, bool IgnoreZeroAndOverSZ64Longs = false)
         {
-            Span<ulong> rng_buf;
-            unsafe
-            {
-                rng_buf = new Span<ulong>(ctx._rngbuf.ToPointer(), ISAAC64_SZ_64);
-            }
-
             if (!IgnoreZeroAndOverSZ64Longs && (SeedULongs.Length > ISAAC64_SZ_64 || SeedULongs.Length == 0))
                 throw new ArgumentException($"Cannot seed ISAAC64 with zero or more than {ISAAC64_SZ_64} ulongs! To pass a zero array size or an array size > {ISAAC64_SZ_64}, set IgnoreZeroAndOverSZ64Longs to true.");
 
@@ -150,7 +151,7 @@ namespace Isaac64
 
             int sl = (SeedULongs.Length > ISAAC64_SZ_64) ? ISAAC64_SZ_64 : SeedULongs.Length;
             for (int i = 0; i < sl; i++)
-                rng_buf[i] = SeedULongs[i];
+                ctx.rng_buf[i] = SeedULongs[i];
 
             init();
         }
@@ -162,18 +163,12 @@ namespace Isaac64
         /// <returns>none</returns>
         public void Reseed(ulong NumericSeed, bool IgnoreZeroSeed = false)
         {
-            Span<ulong> rng_buf;
-            unsafe
-            {
-                rng_buf = new Span<ulong>(ctx._rngbuf.ToPointer(), ISAAC64_SZ_64);
-            }
-
             clear_state();
             if (IgnoreZeroSeed && NumericSeed == 0)
                 init(true);
             else
             {
-                rng_buf[0] = NumericSeed;
+                ctx.rng_buf[0] = NumericSeed;
                 init();
             }
         }
@@ -181,28 +176,23 @@ namespace Isaac64
         // clear the rng state
         private void clear_state()
         {
-            Span<ulong> rng_state;
-            unsafe
-            {
-                rng_state = new Span<ulong>(ctx._stbuf.ToPointer(), ISAAC64_SZ_64);
-            }
-            for (int i = 0; i < ISAAC64_SZ_64; i++) rng_state[i] = (ulong)0;
+            for (int i = 0; i < ISAAC64_SZ_64; i++) ctx.rng_state[i] = (ulong)0;
         }
 
         // sets the curptr in the rng_buf back to max
         private void reset_curptr()
         {
-            ctx.rngbuf_curptr = ISAAC64_SZ_8;
+            ctx.rngbuf_curptr = ISAAC64_SZ_64;
         }
 
         // decrements the curptr if possible, if not, shuffles
         private void dec_curptr()
         {
-            ctx.rngbuf_curptr -= ISAAC64_WORD_SZ;
+            ctx.rngbuf_curptr--;
             if (ctx.rngbuf_curptr <= 0)
             {
                 Shuffle();
-                ctx.rngbuf_curptr -= ISAAC64_WORD_SZ;
+                ctx.rngbuf_curptr--;
             }
         }
 
@@ -213,46 +203,33 @@ namespace Isaac64
         // a, b, x, y -> isaac64() local vars (Context.aa, Context.bb, temporaries x & y)
         private void rng_step(ref int state_idx1, ref int state_idx2, ref int rng_idx, ref ulong a, ref ulong b, ref ulong x, ref ulong y)
         {
-            Span<ulong> rng_buf, rng_state;
-            unsafe
-            {
-                rng_buf = new Span<ulong>(ctx._rngbuf.ToPointer(), ISAAC64_SZ_64);
-                rng_state = new Span<ulong>(ctx._stbuf.ToPointer(), ISAAC64_SZ_64);
-            }
-
-            x = rng_state[state_idx1];
+            x = ctx.rng_state[state_idx1];
 
             switch (state_idx1 % 4)
             {
                 case 0:
-                    a = ~(a ^ (a << 21)) + rng_state[state_idx2++];
+                    a = ~(a ^ (a << 21)) + ctx.rng_state[state_idx2++];
                     break;
                 case 1:
-                    a = (a ^ (a >> 5)) + rng_state[state_idx2++];
+                    a = (a ^ (a >> 5)) + ctx.rng_state[state_idx2++];
                     break;
                 case 2:
-                    a = (a ^ (a << 12)) + rng_state[state_idx2++];
+                    a = (a ^ (a << 12)) + ctx.rng_state[state_idx2++];
                     break;
                 case 3:
-                    a = (a ^ (a >> 33)) + rng_state[state_idx2++];
+                    a = (a ^ (a >> 33)) + ctx.rng_state[state_idx2++];
                     break;
             }
 
-            rng_state[state_idx1++] = y = ind(x) + a + b;
-            rng_buf[rng_idx++] = b = ind(y >> ISAAC64_WORD_SZ) + x;
+            ctx.rng_state[state_idx1++] = y = ind(x) + a + b;
+            ctx.rng_buf[rng_idx++] = b = ind(y >> ISAAC64_WORD_SZ) + x;
         }
 
         // Helper method for the isaac64() method
         private ulong ind(ulong x)
         {
-            Span<ulong> rng_state;
-            unsafe
-            {
-                rng_state = new Span<ulong>(ctx._stbuf.ToPointer(), ISAAC64_SZ_64);
-            }
-
             int index = (int)(x & IND_MASK) / 8;
-            return rng_state[index];
+            return ctx.rng_state[index];
         }
 
         // Helper method for the isaac64() & init() methods
@@ -299,13 +276,6 @@ namespace Isaac64
         {
             int i;
 
-            Span<ulong> rng_buf, rng_state;
-            unsafe
-            {
-                rng_buf = new Span<ulong>(ctx._rngbuf.ToPointer(), ISAAC64_SZ_64);
-                rng_state = new Span<ulong>(ctx._stbuf.ToPointer(), ISAAC64_SZ_64);
-            }
-
             /* No need to waste the time on every update
              * 
              * const ulong MAGIC = 0x9E3779B97F4A7C13;
@@ -332,12 +302,12 @@ namespace Isaac64
             {
                 if (!Zero)
                     for (int j = 0; j < 8; j++)
-                        x[j] += rng_buf[i + j];
+                        x[j] += ctx.rng_buf[i + j];
 
                 mix(ref x);
 
                 for (int j = 0; j < 8; j++)
-                    rng_state[i + j] = x[j];
+                    ctx.rng_state[i + j] = x[j];
             }
 
             if (!Zero)
@@ -345,12 +315,12 @@ namespace Isaac64
                 for (i = 0; i < ISAAC64_SZ_64; i += 8)
                 { 
                     for (int j = 0; j < 8; j++)
-                        x[j] += rng_state[i + j];
+                        x[j] += ctx.rng_state[i + j];
 
                     mix(ref x);
 
                     for (int j = 0; j < 8; j++)
-                        rng_state[i + j] = x[j];
+                        ctx.rng_state[i + j] = x[j];
                 }
             }
 
@@ -367,16 +337,10 @@ namespace Isaac64
         {
             if (Max == ulong.MaxValue) Max = 0;
 
-            Span<byte> rng_buf;
-            unsafe
-            {
-                rng_buf = new Span<byte>(ctx._rngbuf.ToPointer(), ISAAC64_SZ_8);
-            }
-
             // enough bytes?
             dec_curptr();
 
-            ulong ul = BitConverter.ToUInt64(rng_buf.Slice(ctx.rngbuf_curptr, 8).ToArray());
+            ulong ul = ctx.rng_buf[ctx.rngbuf_curptr];
             return (Max == 0) ? ul : ul % ++Max;
         }
 
@@ -422,20 +386,14 @@ namespace Isaac64
         {
             if (Max == uint.MaxValue) Max = 0;
 
-            Span<byte> rng_buf;
-            unsafe
-            {
-                rng_buf = new Span<byte>(ctx._rngbuf.ToPointer(), ISAAC64_SZ_8);
-            }
-
             if (banked32.Count > 0)
             {
                 return (Max == 0) ? banked32.Pop() : banked32.Pop() % ++Max;
             }
             dec_curptr();
-            
-            uint ui = BitConverter.ToUInt32(rng_buf.Slice(ctx.rngbuf_curptr, 4).ToArray());
-            banked32.Push(BitConverter.ToUInt32(rng_buf.Slice(ctx.rngbuf_curptr + 4, 4).ToArray()));
+
+            uint ui = (uint)(ctx.rng_buf[ctx.rngbuf_curptr] & LOW32);
+            banked32.Push((uint)((ctx.rng_buf[ctx.rngbuf_curptr] & HIGH32) >> 32));
 
             return (Max == 0) ? ui : ui % ++Max;
         }
@@ -482,21 +440,16 @@ namespace Isaac64
         {
             if (Max == ushort.MaxValue) Max = 0;
 
-            Span<byte> rng_buf;
-            unsafe
-            {
-                rng_buf = new Span<byte>(ctx._rngbuf.ToPointer(), ISAAC64_SZ_8);
-            }
-
             if (banked16.Count > 0)
             {
                 return (Max == 0) ? banked16.Pop() : (ushort)(banked16.Pop() % ++Max);
             }
             dec_curptr();
 
-            ushort us = BitConverter.ToUInt16(rng_buf.Slice(ctx.rngbuf_curptr, 2).ToArray());
-            for (int i = 2; i < 8; i += 2)
-                banked16.Push(BitConverter.ToUInt16(rng_buf.Slice(ctx.rngbuf_curptr + i, 2).ToArray()));
+            ushort us = Convert.ToUInt16(ctx.rng_buf[ctx.rngbuf_curptr] & 0x0000_0000_0000_FFFF);
+
+            for (int i = 0; i < 3; i++)
+                banked16.Push(Convert.ToByte((ctx.rng_buf[ctx.rngbuf_curptr] & (ulong)(0xFFFF << ((i + 1) * 16)) >> ((i + 1) * 16))));
 
             return (Max == 0) ? us : (ushort)((uint)us % ++Max);
         }
@@ -543,21 +496,16 @@ namespace Isaac64
         {
             if (Max == byte.MaxValue) Max = 0;
 
-            Span<byte> rng_buf;
-            unsafe
-            {
-                rng_buf = new Span<byte>(ctx._rngbuf.ToPointer(), ISAAC64_SZ_8);
-            }
-
             if (banked8.Count > 0)
             {
                 return (Max == 0) ? banked8.Pop() : (byte)(banked8.Pop() % ++Max);
             }
             dec_curptr();
 
-            byte ub = rng_buf.Slice(ctx.rngbuf_curptr, 1)[0];
-            for (int i = 2; i < 8; i ++)
-                banked8.Push(rng_buf.Slice(ctx.rngbuf_curptr + i, 1)[0]);
+            byte ub = Convert.ToByte(ctx.rng_buf[ctx.rngbuf_curptr] & 0x0000_0000_0000_00FF);
+
+            for (int i = 0; i < 7; i++)
+                banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rngbuf_curptr] & (ulong)(0xFF << ((i + 1) * 8)) >> ((i + 1) * 8))));
 
             return (Max == 0) ? ub : (byte)((uint)ub % ++Max);
         }

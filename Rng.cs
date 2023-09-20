@@ -668,9 +668,9 @@ namespace Isaac64
             bool same_sign = (d1.IsNeg == d2.IsNeg);
 
             // Default to 0s for subnormals (exp is always 0)
-            int exp_min = 0;
-            int exp_max = 0;
-            int new_exp = 0;
+            uint exp_min = 0;
+            uint exp_max = 0;
+            uint new_exp = 0;
 
             // Generate a new exponent if necessary
             if (!sn)
@@ -691,12 +691,13 @@ namespace Isaac64
                 {
                     // they are not the same sign; the min exp will
                     // always be MinZero, however because Min and
-                    // Max straddle the zero line
+                    // Max straddle the zero line we have to check
+                    // which one we're randomizing toward
                     exp_min = mz.Exp;
                     exp_max = (rnd_neg) ? d1.Exp : d2.Exp;
                 }
 
-                new_exp = RangedRand32S(exp_min, exp_max);
+                new_exp = RangedRand32(exp_min, exp_max);
             }
             
             // Work on the fractional part
@@ -747,19 +748,19 @@ namespace Isaac64
         public class Dub
         {
             public static readonly int EXP_BIAS = 0x3ff;
-            public static readonly int EXP_MIN = 1;
-            public static readonly int EXP_MAX = 0x7fe;
+            public static readonly uint EXP_MIN = 1;
+            public static readonly uint EXP_MAX = 0x7fe;
             public static readonly ulong SIGN_BIT = ((ulong)1 << 63);
             public static readonly ulong FRAC_BITS = (ulong)0xF_FFFF_FFFF_FFFF;
 
             private bool _neg;
-            private int _exp;
+            private uint _exp;
             private ulong _frac;
 
             public bool IsNeg { get { return _neg; } }
-            public int Exp { get { return _exp; } }
+            public uint Exp { get { return _exp; } }
             public bool HasNegExp { get { return (_exp < EXP_BIAS); } }
-            public int UnbiasedExp { get { return _exp - EXP_BIAS; } }
+            public int UnbiasedExp { get { return (int)_exp - EXP_BIAS; } }
             public ulong Frac { get { return _frac; } }
             
             public Dub(double InDub)
@@ -767,7 +768,7 @@ namespace Isaac64
                 ulong db = System.BitConverter.DoubleToUInt64Bits(InDub);
                 
                 _neg = (db & SIGN_BIT) != 0;
-                _exp = (int)(((db & ~SIGN_BIT) & ~FRAC_BITS) >> 52);
+                _exp = (uint)(((db & ~SIGN_BIT) & ~FRAC_BITS) >> 52);
                 _frac = (db & FRAC_BITS);
             }            
         }

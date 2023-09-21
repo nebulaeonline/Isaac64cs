@@ -27,9 +27,11 @@ These constructors will throw exceptions if used unseeded (0 or empty arrays), o
 6. `Shuffle()` mixes & rotates the data and refills the RNG buffer (occurs automatically at mod 256 runs)
 7. `Reseed()` reseeds the RNG from ground zero at any time; has variants mirroring the class constructors
 
+When pulling a data type smaller than 64-bits, the remaining bytes of the 8-byte chunk are banked until you request that same type size again.
+
 ### Notes on Random Doubles:
 
-When pulling a data type smaller than 64-bits, the remaining bytes of the 8-byte chunk are banked until you request that same type size again. All doubles pull a 64-bit integer for the mantissa/fraction. Regular doubles may also pull up to two 16-bit integers, one for the sign and one for the exponent. If the specified Min & Max are the same sign, no integer is pulled.  Likewise, if Min & Max share a common exponent, no integer will be pulled. Subnormal doubles (extremely small < 10^-308) will never pull an integer for their exponent, and may or may not pull an integer for their sign, exactly the same as regular doubles.
+All doubles pull a 64-bit integer for the mantissa/fraction. Regular doubles may also pull up to two 16-bit integers, one for the sign and one for the exponent. If the specified Min & Max are the same sign, no integer is pulled.  Likewise, if Min & Max share a common exponent, no integer will be pulled. Subnormal doubles (extremely small < 10^-308) will never pull an integer for their exponent, and may or may not pull an integer for their sign, exactly the same as regular doubles.
 
 ### Standard Conformance:
 

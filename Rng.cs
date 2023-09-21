@@ -189,7 +189,7 @@ namespace Isaac64
         private void dec_curptr()
         {
             ctx.rngbuf_curptr--;
-            if (ctx.rngbuf_curptr <= 0)
+            if (ctx.rngbuf_curptr < 0)
             {
                 Shuffle();
                 ctx.rngbuf_curptr--;

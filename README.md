@@ -20,7 +20,7 @@ These constructors will throw exceptions if used unseeded (0 or empty arrays), o
 ### Methods:
 
 1. `RandN(_size_ Max)`, where N is 64/32/16/8.  These methods return unsigned integers of the corresponding size
-2. `RangedRandN(_size_ Min, _size_ Max)` and `RangedRandNS(_size_ Min, _size_ Max)` methods return signed integers
+2. `RangedRandN(_size_ Min, _size_ Max)` method retuns unsigned integers between Min & Max; `RangedRandNS(_size_ Min, _size_ Max)` returns signed integers instead
 3. `RandAlphaNum(bool Upper, bool Lower, bool Numeric)` generates a char using the range(s) specified
 4. `RandDouble()` returns a 64-bit double-precision float in the range (0.0, 1.0)
 5. `RandDoubleRaw(double Min, double Max, double MinZero = 1e-3)` generates a double in the range (Min, Max) using the MinZero parameter as the defacto smallest number (see source for info)

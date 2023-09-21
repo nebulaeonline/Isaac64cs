@@ -1,12 +1,12 @@
 # Isaac64cs
 #### ISAAC64 Library Implementation in C# 
----
 
 I'm a big fan of using Isaac64 here and there in my projects, and this one is designed to be super easy to use.
 
 ---
+
 ### Isaac64.Rng()
----
+
 ###  Constructors:
 
 1. `Rng()`: RNG seeded with 2048 bytes from the system's crypto RNG
@@ -17,7 +17,6 @@ I'm a big fan of using Isaac64 here and there in my projects, and this one is de
  
 These constructors will throw exceptions if used unseeded (0 or empty arrays), or if the passed arrays exceed the prescribed size limits (no silent ignore). The flags are provided to allow overriding this behavior should your use case require it, or if you wish to test for standards conformance.
 
----
 ### Methods:
 
 1. `RandN(_size_ Max)`, where N is 64/32/16/8.  These methods return unsigned integers of the corresponding size
@@ -28,25 +27,21 @@ These constructors will throw exceptions if used unseeded (0 or empty arrays), o
 6. `Shuffle()` mixes & rotates the data and refills the RNG buffer (occurs automatically at mod 256 runs)
 7. `Reseed()` reseeds the RNG from ground zero at any time; has variants mirroring the class constructors
 
----
 ### Notes on Random Doubles:
 
 When pulling a data type smaller than 64-bits, the remaining bytes of the 8-byte chunk are banked until you request that same type size again. All doubles pull a 64-bit integer for the mantissa/fraction. Regular doubles may also pull up to two 16-bit integers, one for the sign and one for the exponent. If the specified Min & Max are the same sign, no integer is pulled.  Likewise, if Min & Max share a common exponent, no integer will be pulled. Subnormal doubles (extremely small < 10^-308) will never pull an integer for their exponent, and may or may not pull an integer for their sign, exactly the same as regular doubles.
 
----
 ### Standard Conformance:
 
 1. Verified against Bob Jenkins' original C reference implementation: [ISAAC64](https://burtleburtle.net/bob/rand/isaacafa.html)
 2. Verified both seeded and unseeded tests (32 & 64-bit) with the Rust core library: [Rust Core Lib](https://docs.rs/rand_isaac/latest/src/rand_isaac/isaac64.rs.html)
 3. Verified with the Zig std library's Isaac64 crypto provider: [Zig Std](https://github.com/ziglang/zig/blob/master/lib/std/rand/Isaac64.zig)
 
----
 ### Building:
 
 This builds on the newest .NET 8 Preview 7 (September 2023) in the AOT build configuration, and nothing is too fancy.
 It should build going pretty far back in the C# lineage if required.
 
----
 ### Etc:
 
 If there are any bugs or diversions from the spec, please reach out.

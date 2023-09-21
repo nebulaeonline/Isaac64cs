@@ -547,13 +547,13 @@ namespace Isaac64
         /// <summary>
         /// RandAlphaNum() returns a char conforming to the specified options
         /// </summary>
-        /// <param name="AlphaUpper">bool AlphaUpper - include upper case alphas?</param>
-        /// <param name="AlphaLower">bool AlphaLower - include lower case alphas?</param>
+        /// <param name="Upper">bool AlphaUpper - include upper case alphas?</param>
+        /// <param name="Lower">bool AlphaLower - include lower case alphas?</param>
         /// <param name="Numeric">bool Numeric -    include numeric characters?</param>
         /// <returns>char</returns>
-        public char RandAlphaNum(bool AlphaUpper = true, bool AlphaLower = true, bool Numeric = true)
+        public char RandAlphaNum(bool Upper = true, bool Lower = true, bool Numeric = true)
         {
-            if (!AlphaUpper && !AlphaLower && !Numeric) { throw new ArgumentException("You must select at least one character class in RandChar()"); }
+            if (!Upper && !Lower && !Numeric) { throw new ArgumentException("You must select at least one character class in RandChar()"); }
             
             const byte NUMERIC = 0x30;
             const byte UALPHA = 0x41;
@@ -561,8 +561,8 @@ namespace Isaac64
 
             byte rcnt = (Numeric) ? (byte)10 : (byte)0;
 
-            if (AlphaUpper) { rcnt += (byte)26; }
-            if (AlphaLower) { rcnt += (byte)26; }
+            if (Upper) { rcnt += (byte)26; }
+            if (Lower) { rcnt += (byte)26; }
 
             byte rnd = Rand8(--rcnt);
 
@@ -571,9 +571,9 @@ namespace Isaac64
             else if (Numeric)
                 rnd -= 10;
 
-            if (AlphaUpper && rnd < 26)
+            if (Upper && rnd < 26)
                 return Convert.ToChar(rnd + UALPHA);
-            else if (AlphaUpper)
+            else if (Upper)
                 rnd -= 26;
 
             return Convert.ToChar(rnd + LALPHA);

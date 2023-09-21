@@ -7,4 +7,12 @@
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="J:\coding\github\isaac64\Isaac64cs\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="J:\coding\github\isaac64\Isaac64cs\.editorconfig" />
+  </ItemGroup>
+
 </Project>

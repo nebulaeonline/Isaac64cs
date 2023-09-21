@@ -1,51 +1,54 @@
 # Isaac64cs
+#### ISAAC64 Library Implementation in C# 
+---
 
-ISAAC64 Implementation in C#
+I'm a big fan of using Isaac64 here and there in my projects, and this one is designed to be super easy to use.
 
-I am a big fan of using Isaac64 here and there in my projects.
+---
+### Isaac64.Rng()
+---
+###  Constructors:
 
-This one is made to be super simple:
+1. `Rng()`: RNG seeded with 2048 bytes from the system's crypto RNG
+2. `Rng(bool)`: unseeded RNG suitable for verifying against the spec
+3. `Rng(byte[], bool = false)`: RNG seeded with a byte array containing up to 2048 bytes
+4. `Rng(ulong[], bool = false)`: RNG seeded with an array of up to 256 ulongs
+5. `Rng(ulong, bool = false)`: RNG seeded with a single UInt64 number > 0
+ 
+These constructors will throw exceptions if used unseeded (0 or empty arrays), or if the passed arrays exceed the prescribed size limits (no silent ignore). The flags are provided to allow overriding this behavior should your use case require it, or if you wish to test for standards conformance.
 
-Create an instance of the Isaac64.Rng() class, it has 4 constructors: (1) is the default
-and constructs a new RNG using the system's crypto RNG to generate a seed; (2) constructs
-a new RNG from a single UInt64 number; (3) uses a UInt64 array containing up to 256
-numbers; and (4) uses a byte array containing up to 2048 bytes.  These constructors
-will throw exceptions if used in a non-optimal (or unseeded) manner.  All except the
-default have a boolean override value in case you wish to deviate or test for
-standards conformance.
+---
+### Methods:
 
-There are RandN() & RangedRandN() methods for 64/32/16/8 bit unsigned integers.
-The RandN() methods can take a Max argument (of the same type), while the 
-RangedRandN() methods take a Min and a Max and will return a number between
-those specified. The RangedRandNS() methods work the same, but they accept
-signed arguments for Min & Max, and likewise return signed integers.
+1. `RandN(_size_ Max)`, where N is 64/32/16/8.  These methods return unsigned integers of the corresponding size
+2. `RangedRandN(_size_ Min, _size_ Max)` and `RangedRandNS(_size_ Min, _size_ Max)` methods return signed integers
+3. `RandAlphaNum(bool Upper, bool Lower, bool Numeric)` generates a char using the range(s) specified
+4. `RandDouble()` returns a 64-bit double-precision float in the range (0.0, 1.0)
+5. `RandDoubleRaw(double Min, double Max, double MinZero = 1e-3)` generates a double in the range (Min, Max) using the MinZero parameter as the defacto smallest number (see source for info)
+6. `Shuffle()` mixes & rotates the data and refills the RNG buffer (occurs automatically at mod 256 runs)
+7. `Reseed()` reseeds the RNG from ground zero at any time; has variants mirroring the class constructors
 
-There are a few new methods (1) RandAlphaNum() which can return uppercase &
-lowercase characters as well as numbers; (2) RandDouble() which returns a
-double in the range (0, 1); and (3) RandDoubleRaw(), which provides a great
-deal of flexibility in generating doubles within a given range.
+---
+### Notes on Random Doubles:
 
-The Shuffle() method mixes & rotates the data and fill back up the RNG buffer.  
-It shuffles after every 256 64-bit numbers automatically, but if you have 
-a need to do it more frequently the option is there.
+When pulling a data type smaller than 64-bits, the remaining bytes of the 8-byte chunk are banked until you request that same type size again. All doubles pull a 64-bit integer for the mantissa/fraction. Regular doubles may also pull up to two 16-bit integers, one for the sign and one for the exponent. If the specified Min & Max are the same sign, no integer is pulled.  Likewise, if Min & Max share a common exponent, no integer will be pulled. Subnormal doubles (extremely small < 10^-308) will never pull an integer for their exponent, and may or may not pull an integer for their sign, exactly the same as regular doubles.
 
-You can also Reseed() the RNG from ground zero at any time, and the Reseed()
-methods come in the same varieties as the non-default, non-testing constructors.
+---
+### Standard Conformance:
 
-If you pull a smaller data type than 64-bits (8 bytes), the remaining pieces 
-of the 8-byte chunk are banked until you request that data size again.
+1. Verified against Bob Jenkins' original C reference implementation: [ISAAC64](https://burtleburtle.net/bob/rand/isaacafa.html)
+2. Verified both seeded and unseeded tests (32 & 64-bit) with the Rust core library: [Rust Core Lib](https://docs.rs/rand_isaac/latest/src/rand_isaac/isaac64.rs.html)
+3. Verified with the Zig std library's Isaac64 crypto provider: [Zig Std](https://github.com/ziglang/zig/blob/master/lib/std/rand/Isaac64.zig)
 
-As for conformance, I have checked this against Bob Jenkins' original C reference
-implementation here: https://burtleburtle.net/bob/rand/isaacafa.html
+---
+### Building:
 
-I have also verified both the seeded and unseeded tests (32/64 bit) with the 
-code in the Rust core library here: https://docs.rs/rand_isaac/latest/src/rand_isaac/isaac64.rs.html
+This builds on the newest .NET 8 Preview 7 (September 2023) in the AOT build configuration, and nothing is too fancy.
+It should build going pretty far back in the C# lineage if required.
 
-The Zig std library's Isaac64 crypto provider also matches my unseeded output,
-and it can be found here: https://github.com/ziglang/zig/blob/master/lib/std/rand/Isaac64.zig
-
-This builds on the newest .NET 8 Preview 7 (September 2023) in the AOT build configuration.
+---
+### Etc:
 
 If there are any bugs or diversions from the spec, please reach out.
 
-N
+## N

@@ -58,9 +58,9 @@ namespace Isaac64
         /// </summary>
         /// <param name="Testing">bool Testing - for testing purposes; if false, this will throw</param>
         /// <returns>the constructed & seeded rng</returns>
-        public Rng(bool Testing)
+        public Rng(bool Testing = false)
         {
-            Reseed(0, true);
+            Reseed(0, Testing);
         }
 
         /// <summary>

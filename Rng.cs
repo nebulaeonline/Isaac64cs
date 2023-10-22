@@ -11,6 +11,8 @@ namespace Isaac64
         private const ulong IND_MASK = (ulong)(((ISAAC64_SZ_64) - 1) << 3);
         private const ulong HIGH32 = 0xFFFF_FFFF_0000_0000;
         private const ulong LOW32 = 0x0000_0000_FFFF_FFFF;
+        private const ulong LOW16 = 0x0000_0000_0000_FFFF;
+        private const ulong LOW8 = 0x0000_0000_0000_00FF;
 
         // banked randoms
         private Stack<uint> banked32 = new Stack<uint>();
@@ -451,10 +453,10 @@ namespace Isaac64
             }
             dec_curptr();
 
-            ushort us = Convert.ToUInt16(ctx.rng_buf[ctx.rngbuf_curptr] & 0x0000_0000_0000_FFFF);
+            ushort us = Convert.ToUInt16(ctx.rng_buf[ctx.rngbuf_curptr] & LOW16);
 
             for (int i = 0; i < 3; i++)
-                banked16.Push(Convert.ToByte((ctx.rng_buf[ctx.rngbuf_curptr] & (ulong)(0xFFFF << ((i + 1) * 16)) >> ((i + 1) * 16))));
+                banked16.Push(Convert.ToByte((ctx.rng_buf[ctx.rngbuf_curptr] & (ulong)(LOW16 << ((i + 1) * 16)) >> ((i + 1) * 16))));
 
             return (Max == 0) ? us : (ushort)((uint)us % ++Max);
         }
@@ -509,10 +511,10 @@ namespace Isaac64
             }
             dec_curptr();
 
-            byte ub = Convert.ToByte(ctx.rng_buf[ctx.rngbuf_curptr] & 0x0000_0000_0000_00FF);
+            byte ub = Convert.ToByte(ctx.rng_buf[ctx.rngbuf_curptr] & LOW8);
 
             for (int i = 0; i < 7; i++)
-                banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rngbuf_curptr] & (ulong)(0xFF << ((i + 1) * 8)) >> ((i + 1) * 8))));
+                banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rngbuf_curptr] & (ulong)(LOW8 << ((i + 1) * 8)) >> ((i + 1) * 8))));
 
             return (Max == 0) ? ub : (byte)((uint)ub % ++Max);
         }

@@ -354,28 +354,30 @@ namespace Isaac64
         public ulong RangedRand64(ulong Min, ulong Max)
         {
             if (Min == Max) { return Min; }
+            if (Max < Min) { (Min, Max) = (Max, Min); }
 
-            var rmax = Math.Max(Min, Max) - Math.Min(Min, Max);
+            var rmax = Max - Min;
             var r = Rand64(rmax);
-            return r + Math.Min(Min, Max);
+            return r + Min;
         }
 
         /// <summary>
         /// RangedRand64S() returns a signed 64-bit integer in the range [Min, Max] (inclusive)
         /// </summary>
-        /// <param name="Min">ulong Min - the minimum random number to return</param>
-        /// <param name="Max">ulong Max - the maximum random number to return</param>
+        /// <param name="Min">long Min - the minimum random number to return</param>
+        /// <param name="Max">long Max - the maximum random number to return</param>
         /// <returns>long</returns>
         public long RangedRand64S(long Min, long Max)
         {
             if (Min == Max) { return Min; }
+            if (Max < Min) { (Min, Max) = (Max, Min); }
 
             ulong u1, u2;
             u1 = (ulong)Min;
             u2 = (ulong)Max;
 
-            ulong r = RangedRand64(Math.Min(u1, u2), Math.Max(u1, u2));
-            return (long)r;            
+            ulong r = RangedRand64(u1, u2);
+            return (long)r;
         }
 
         /// <summary>
@@ -408,10 +410,11 @@ namespace Isaac64
         public uint RangedRand32(uint Min, uint Max)
         {
             if (Min == Max) { return Min; }
+            if (Max < Min) { (Min, Max) = (Max, Min); }
 
-            uint rmax = Math.Max(Min, Max) - Math.Min(Min, Max);
+            uint rmax = Max - Min;
             uint r = Rand32(rmax);
-            return r + Math.Min(Min, Max);
+            return r + Min;
         }
 
         /// <summary>
@@ -423,12 +426,13 @@ namespace Isaac64
         public int RangedRand32S(int Min, int Max)
         {
             if (Min == Max) { return Min; }
+            if (Max < Min) { (Min, Max) = (Max, Min); }
 
             uint u1, u2;
             u1 = (uint)Min;
             u2 = (uint)Max;
 
-            uint r = RangedRand32(Math.Min(u1, u2), Math.Max(u1, u2));
+            uint r = RangedRand32(u1, u2);
             return (int)r;
         }
 
@@ -464,10 +468,11 @@ namespace Isaac64
         public ushort RangedRand16(ushort Min, ushort Max)
         {
             if (Min == Max) { return Min; }
+            if (Max < Min) { (Min, Max) = (Max, Min); }
 
-            ushort rmax = (ushort)(Math.Max(Min, Max) - Math.Min(Min, Max));
+            ushort rmax = (ushort)(Max - Min);
             ushort r = Rand16((ushort)rmax);
-            return (ushort)(r + Math.Min(Min, Max));
+            return (ushort)(r + Min);
         }
 
         /// <summary>
@@ -479,12 +484,13 @@ namespace Isaac64
         public short RangedRand16S(short Min, short Max)
         {
             if (Min == Max) { return Min; }
+            if (Max < Min) { (Min, Max) = (Max, Min); }
 
             ushort u1, u2;
             u1 = (ushort)Min;
             u2 = (ushort)Max;
 
-            ushort r = RangedRand16(Math.Min(u1, u2), Math.Max(u1, u2));
+            ushort r = RangedRand16(u1, u2);
             return (short)r;
         }
 
@@ -520,10 +526,11 @@ namespace Isaac64
         public byte RangedRand8(byte Min, byte Max)
         {
             if (Min == Max) { return Min; }
+            if (Max < Min) { (Min, Max) = (Max, Min); }
 
-            byte rmax = (byte)(Math.Max(Min, Max) - Math.Min(Min, Max));
+            byte rmax = (byte)(Max - Min);
             byte r = Rand8(rmax);
-            return (byte)(r + Math.Min(Min, Max));
+            return (byte)(r + Min);
         }
 
         /// <summary>
@@ -535,12 +542,13 @@ namespace Isaac64
         public sbyte RangedRand8S(sbyte Min, sbyte Max)
         {
             if (Min == Max) { return Min; }
+            if (Max < Min) { (Min, Max) = (Max, Min); }
 
-            sbyte u1, u2;
-            u1 = (sbyte)Min;
-            u2 = (sbyte)Max;
+            byte u1, u2;
+            u1 = (byte)Min;
+            u2 = (byte)Max;
 
-            byte r = RangedRand8((byte)Math.Min(u1, u2), (byte)Math.Max(u1, u2));
+            byte r = RangedRand8(u1, u2);
             return (sbyte)r;
         }
 
@@ -549,7 +557,7 @@ namespace Isaac64
         /// </summary>
         /// <param name="Upper">bool AlphaUpper - include upper case alphas?</param>
         /// <param name="Lower">bool AlphaLower - include lower case alphas?</param>
-        /// <param name="Numeric">bool Numeric -    include numeric characters?</param>
+        /// <param name="Numeric">bool Numeric -  include numeric characters?</param>
         /// <returns>char</returns>
         public char RandAlphaNum(bool Upper = true, bool Lower = true, bool Numeric = true)
         {
@@ -606,25 +614,27 @@ namespace Isaac64
         //
         // Ranges (negative or positive):
         //
-        //      2.2250738585072014 × 10^−308 (Min normal double) to
-        //      1.7976931348623157 × 10^308  (Max normal double)
+        //  +/- 2.2250738585072014 × 10^−308 (Min normal double) to
+        //  +/- 1.7976931348623157 × 10^308  (Max normal double)
         //
         // and
         //
-        //      4.9406564584124654 × 10^−324 (Min subnormal double) to
-        //      2.2250738585072009 × 10^−308 (Max subnormal double)
+        //  +/- 4.9406564584124654 × 10^−324 (Min subnormal double) to
+        //  +/- 2.2250738585072009 × 10^−308 (Max subnormal double)
         //
         // Other relevant info about ieee-754 double precision numbers:
         //
+        //     For reference:
         //      18,446,744,073,709,551,615 UInt64.Max
         //      -9,223,372,036,854,775,808 Int64.Min
         //       9,223,372,036,854,775,807 Int64.Max
         //
+        //     Doubles:
         //      −9,007,199,254,740,992  Double Min Integer Exactly Representable
         //       9,007,199,254,740,992  Double Max Integer Exactly Representable
-        //      18,014,398,509,481,984  Double Max Integer Representable By 2x
-        //      36,028,797,018,963,968  Double Max Integer Representable By 4x
-        //      Integers 2^n to 2^(n+1)                    Representable By 2n^(-52)x
+        //  +/- 18,014,398,509,481,984  Double Max Integer Representable By 2x (i.e. n mod 2 == 0)
+        //  +/- 36,028,797,018,963,968  Double Max Integer Representable By 4x (i.e. n mod 4 == 0)
+        //  +/- Integers 2^n to 2^(n+1)                    Representable By 2n^(-52)x
         //
         // MinZero is the practical minimum when zero is part of the range
         // MinZero is +0 for subnormals
@@ -759,14 +769,14 @@ namespace Isaac64
             private ulong _frac;
 
             public bool IsNeg { get { return _neg; } }
-            public uint Exp { get { return _exp; } }
+            public uint Exp { get { return _exp; } }  
             public bool HasNegExp { get { return (_exp < EXP_BIAS); } }
             public int UnbiasedExp { get { return (int)_exp - EXP_BIAS; } }
             public ulong Frac { get { return _frac; } }
             
             public Dub(double InDub)
             {
-                ulong db = System.BitConverter.DoubleToUInt64Bits(InDub);
+                ulong db = BitConverter.DoubleToUInt64Bits(InDub);
                 
                 _neg = (db & SIGN_BIT) != 0;
                 _exp = (uint)(((db & ~SIGN_BIT) & ~FRAC_BITS) >> 52);

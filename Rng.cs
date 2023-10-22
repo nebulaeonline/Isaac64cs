@@ -372,12 +372,12 @@ namespace Isaac64
         public long RangedRand64S(long Min, long Max)
         {
             if (Min == Max) { return Min; }
-            if (Max < Min) { (Min, Max) = (Max, Min); }
-
+            
             ulong u1, u2;
             u1 = (ulong)Min;
             u2 = (ulong)Max;
 
+            if (u1 < u2) { (u1, u2) = (u2, u1); }
             ulong r = RangedRand64(u1, u2);
             return (long)r;
         }
@@ -428,12 +428,12 @@ namespace Isaac64
         public int RangedRand32S(int Min, int Max)
         {
             if (Min == Max) { return Min; }
-            if (Max < Min) { (Min, Max) = (Max, Min); }
-
+            
             uint u1, u2;
             u1 = (uint)Min;
             u2 = (uint)Max;
 
+            if (u1 < u2) { (u1, u2) = (u2, u1); }
             uint r = RangedRand32(u1, u2);
             return (int)r;
         }
@@ -456,7 +456,7 @@ namespace Isaac64
             ushort us = Convert.ToUInt16(ctx.rng_buf[ctx.rngbuf_curptr] & LOW16);
 
             for (int i = 0; i < 3; i++)
-                banked16.Push(Convert.ToByte((ctx.rng_buf[ctx.rngbuf_curptr] & (ulong)(LOW16 << ((i + 1) * 16)) >> ((i + 1) * 16))));
+                banked16.Push(Convert.ToUInt16((ctx.rng_buf[ctx.rngbuf_curptr] & (ulong)(LOW16 << ((i + 1) * 16))) >> ((i + 1) * 16)));
 
             return (Max == 0) ? us : (ushort)((uint)us % ++Max);
         }
@@ -486,12 +486,12 @@ namespace Isaac64
         public short RangedRand16S(short Min, short Max)
         {
             if (Min == Max) { return Min; }
-            if (Max < Min) { (Min, Max) = (Max, Min); }
-
+            
             ushort u1, u2;
             u1 = (ushort)Min;
             u2 = (ushort)Max;
 
+            if (u1 < u2) { (u1, u2) = (u2, u1); }
             ushort r = RangedRand16(u1, u2);
             return (short)r;
         }
@@ -514,7 +514,7 @@ namespace Isaac64
             byte ub = Convert.ToByte(ctx.rng_buf[ctx.rngbuf_curptr] & LOW8);
 
             for (int i = 0; i < 7; i++)
-                banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rngbuf_curptr] & (ulong)(LOW8 << ((i + 1) * 8)) >> ((i + 1) * 8))));
+                banked8.Push(Convert.ToByte((ctx.rng_buf[ctx.rngbuf_curptr] & (ulong)(LOW8 << ((i + 1) * 8))) >> ((i + 1) * 8)));
 
             return (Max == 0) ? ub : (byte)((uint)ub % ++Max);
         }
@@ -544,11 +544,12 @@ namespace Isaac64
         public sbyte RangedRand8S(sbyte Min, sbyte Max)
         {
             if (Min == Max) { return Min; }
-            if (Max < Min) { (Min, Max) = (Max, Min); }
-
+            
             byte u1, u2;
             u1 = (byte)Min;
             u2 = (byte)Max;
+
+            if (u1 < u2) { (u1, u2) = (u2, u1); }
 
             byte r = RangedRand8(u1, u2);
             return (sbyte)r;

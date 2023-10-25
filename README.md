@@ -41,7 +41,7 @@ All doubles pull a 64-bit integer for the mantissa/fraction. Regular doubles may
 
 ### Building:
 
-This builds on the newest .NET 8 Preview 7 (September 2023) in the AOT build configuration, and nothing is too fancy.
+This builds on the newest .NET 8 RC2 (October 2023) in the AOT build configuration, and nothing is too fancy.
 It should build going pretty far back in the C# lineage if required.
 
 ### Etc:

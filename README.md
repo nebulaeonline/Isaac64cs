@@ -3,6 +3,10 @@
 
 I'm a big fan of using Isaac64 here and there in my projects, and this one is designed to be super easy to use.
 
+The library is battle-tested for 2+ years in production in gaming, and has been used in a variety of other projects including simulations due to its robust random double support.
+
+Note: I would not use this for cryptography. Certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, but ISAAC is not itself advertised as a cryptographic RNG, so use at your own risk for that purpose. Otherwise, I think it is an excellent general purpose PRNG that is standards-compliant.
+
 Latest Update 2025-04-14
 
 1. Fixed a subtle signed-to-unsigned cast wraparound in the RangedRandNS() set of functions
@@ -36,7 +40,7 @@ These constructors will throw exceptions if used unseeded (0 or empty arrays), o
 6. `Shuffle()` mixes & rotates the data and refills the RNG buffer (occurs automatically at mod 256 runs)
 7. `Reseed()` reseeds the RNG from ground zero at any time; has variants mirroring the class constructors
 
-### Mimic of System.Random for 32-bit Ints
+### Mimic of System.Random for 32-bit Ints:
 
 1. `Next()`: returns a 32-bit unsigned integer in the range [0, 2^32)
 2. `Next(int Max)`: returns a 32-bit unsigned integer in the range [0, Max)

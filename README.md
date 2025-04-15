@@ -8,6 +8,7 @@ Latest Update 2025-04-14
 1. Fixed a subtle signed-to-unsigned cast wraparound in the RangedRandNS() set of functions
 2. Fixed error with a 0-seeded Rng  not throwing
 3. Added unit tests so users can feel confident in the library
+4. Added interface that mimics System.Random with 32-bit Next() functions
 
 Speed is approx 17.7 seconds in Debug mode for 500M random numbers (Ryzen 3950x).
 
@@ -34,6 +35,12 @@ These constructors will throw exceptions if used unseeded (0 or empty arrays), o
 5. `RandDoubleRaw(double Min, double Max, double MinZero = 1e-3)` generates a double in the range (Min, Max) using the MinZero parameter as the defacto smallest number (see source for info)
 6. `Shuffle()` mixes & rotates the data and refills the RNG buffer (occurs automatically at mod 256 runs)
 7. `Reseed()` reseeds the RNG from ground zero at any time; has variants mirroring the class constructors
+
+### Mimic of System.Random for 32-bit Ints
+
+1. `Next()`: returns a 32-bit unsigned integer in the range [0, 2^32)
+2. `Next(int Max)`: returns a 32-bit unsigned integer in the range [0, Max)
+3. `Next(int Min, int Max)`: returns a 32-bit unsigned integer in the range [Min, Max)
 
 When pulling a data type smaller than 64-bits, the remaining bytes of the 8-byte chunk are banked until you request that same type size again.
 

@@ -334,6 +334,42 @@ namespace Isaac64
         }
 
         /// <summary>
+        /// Interface that mimics System.Random
+        /// Returns a non-negative random integer (32-bit).
+        /// </summary>
+        public int Next()
+        {
+            return (int)(Rand32() & 0x7FFFFFFF); // Strip sign bit to mimic System.Random
+        }
+
+        /// <summary>
+        /// Interface that mimics System.Random
+        /// Returns a non-negative random integer less than max.
+        /// </summary>
+        public int Next(int max)
+        {
+            if (max <= 0)
+                throw new ArgumentOutOfRangeException(nameof(max), "max must be positive");
+
+            return (int)(Rand32((uint)(max - 1)) & 0x7FFFFFFF);
+        }
+
+        /// <summary>
+        /// Interface that mimics System.Random
+        /// Returns a random integer between min (inclusive) and max (exclusive).
+        /// </summary>
+        public int Next(int min, int max)
+        {
+            if (min > max)
+                (max, min) = (min, max);
+
+            if (min == max)
+                return min;
+
+            return RangedRand32S(min, max - 1);
+        }
+
+        /// <summary>
         /// Rand64() returns an unsigned 64-bit integer in the range [0, Max] (inclusive)
         /// </summary>
         /// <param name="Max">ulong Max - the maximum random number to return</param>

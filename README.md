@@ -16,6 +16,12 @@ Latest Update 2025-04-14
 
 Speed is approx 17.7 seconds in Debug mode for 500M random numbers (Ryzen 3950x).
 
+[![NuGet](https://img.shields.io/nuget/v/Isaac64.svg)](https://www.nuget.org/packages/Isaac64)
+
+Install with:
+
+$ dotnet add package Isaac64
+
 ---
 
 ### Isaac64.Rng()

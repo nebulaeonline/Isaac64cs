@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
       <ProductName>Isaac64</ProductName>
-      <Version>1.0.0</Version>
+      <Version>1.0.1</Version>
       <Authors>Robert C. Horvath, III</Authors>
       <Company>Nebulae Foundation, LLC</Company>
       <Description>Fast, deterministic, standards-compliant ISAAC64 RNG implementation in C# with subword extraction, rejection sampling, and IEEE754 double support.</Description>

@@ -3,6 +3,14 @@
 
 I'm a big fan of using Isaac64 here and there in my projects, and this one is designed to be super easy to use.
 
+Latest Update 2025-04-14
+
+1. Fixed a subtle signed-to-unsigned cast wraparound in the RangedRandNS() set of functions
+2. Fixed error with a 0-seeded Rng  not throwing
+3. Added unit tests so users can feel confident in the library
+
+Speed is approx 17.7 seconds in Debug mode for 500M random numbers (Ryzen 3950x).
+
 ---
 
 ### Isaac64.Rng()
@@ -41,7 +49,7 @@ All doubles pull a 64-bit integer for the mantissa/fraction. Regular doubles may
 
 ### Building:
 
-This builds on the newest .NET 8 RC2 (October 2023) in the AOT build configuration, and nothing is too fancy.
+This builds on the newest .NET 9 (April 2025) in both JITed and AOT build configurations.
 It should build going pretty far back in the C# lineage if required.
 
 ### Etc:

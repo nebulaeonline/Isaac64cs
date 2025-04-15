@@ -168,6 +168,8 @@ namespace Isaac64
             clear_state();
             if (IgnoreZeroSeed && NumericSeed == 0)
                 init(true);
+            else if (NumericSeed == 0)
+                throw new ArgumentException("Rng seeded with 0 value. Set the IgnoreZeroSeed parameter if this behavior is desired.");
             else
             {
                 ctx.rng_buf[0] = NumericSeed;
@@ -193,7 +195,7 @@ namespace Isaac64
             ctx.rngbuf_curptr--;
             if (ctx.rngbuf_curptr < 0)
             {
-                Shuffle();
+                Shuffle(); // Shuffle() resets curptr to ISAAC64_SZ_64, so we dec one more time to get back on track
                 ctx.rngbuf_curptr--;
             }
         }
@@ -371,15 +373,12 @@ namespace Isaac64
         /// <returns>long</returns>
         public long RangedRand64S(long Min, long Max)
         {
-            if (Min == Max) { return Min; }
-            
-            ulong u1, u2;
-            u1 = (ulong)Min;
-            u2 = (ulong)Max;
+            if (Min == Max) return Min;
+            if (Min > Max) (Min, Max) = (Max, Min);
 
-            if (u1 < u2) { (u1, u2) = (u2, u1); }
-            ulong r = RangedRand64(u1, u2);
-            return (long)r;
+            ulong range = (ulong)(Max - Min);
+            ulong rand = Rand64(range);
+            return Min + (long)rand;
         }
 
         /// <summary>
@@ -427,15 +426,12 @@ namespace Isaac64
         /// <returns>int</returns>
         public int RangedRand32S(int Min, int Max)
         {
-            if (Min == Max) { return Min; }
-            
-            uint u1, u2;
-            u1 = (uint)Min;
-            u2 = (uint)Max;
+            if (Min == Max) return Min;
+            if (Min > Max) (Min, Max) = (Max, Min);
 
-            if (u1 < u2) { (u1, u2) = (u2, u1); }
-            uint r = RangedRand32(u1, u2);
-            return (int)r;
+            uint range = (uint)(Max - Min);
+            uint rand = Rand32(range);
+            return Min + (int)rand;
         }
 
         /// <summary>
@@ -485,15 +481,12 @@ namespace Isaac64
         /// <returns>short</returns>
         public short RangedRand16S(short Min, short Max)
         {
-            if (Min == Max) { return Min; }
-            
-            ushort u1, u2;
-            u1 = (ushort)Min;
-            u2 = (ushort)Max;
+            if (Min == Max) return Min;
+            if (Min > Max) (Min, Max) = (Max, Min);
 
-            if (u1 < u2) { (u1, u2) = (u2, u1); }
-            ushort r = RangedRand16(u1, u2);
-            return (short)r;
+            ushort range = (ushort)(Max - Min);
+            ushort rand = Rand16(range);
+            return (short)(Min + rand);
         }
 
         /// <summary>
@@ -543,17 +536,14 @@ namespace Isaac64
         /// <returns>sbyte</returns>
         public sbyte RangedRand8S(sbyte Min, sbyte Max)
         {
-            if (Min == Max) { return Min; }
-            
-            byte u1, u2;
-            u1 = (byte)Min;
-            u2 = (byte)Max;
+            if (Min == Max) return Min;
+            if (Min > Max) (Min, Max) = (Max, Min);
 
-            if (u1 < u2) { (u1, u2) = (u2, u1); }
-
-            byte r = RangedRand8(u1, u2);
-            return (sbyte)r;
+            byte range = (byte)(Max - Min);
+            byte rand = Rand8(range);
+            return (sbyte)(Min + rand);
         }
+
 
         /// <summary>
         /// RandAlphaNum() returns a char conforming to the specified options
@@ -561,34 +551,38 @@ namespace Isaac64
         /// <param name="Upper">bool AlphaUpper - include upper case alphas?</param>
         /// <param name="Lower">bool AlphaLower - include lower case alphas?</param>
         /// <param name="Numeric">bool Numeric -  include numeric characters?</param>
+        /// <param name="ExtraSymbols">char[]? ExtraSymbols - any additional symbols? (pass as char array)</param>
         /// <returns>char</returns>
-        public char RandAlphaNum(bool Upper = true, bool Lower = true, bool Numeric = true)
+        public char RandAlphaNum(bool Upper = true, bool Lower = true, bool Numeric = true, char[]? ExtraSymbols = null)
         {
-            if (!Upper && !Lower && !Numeric) { throw new ArgumentException("You must select at least one character class in RandChar()"); }
-            
-            const byte NUMERIC = 0x30;
-            const byte UALPHA = 0x41;
-            const byte LALPHA = 0x61;
+            List<char> charset = new();
 
-            byte rcnt = (Numeric) ? (byte)10 : (byte)0;
+            if (Numeric)
+                charset.AddRange("0123456789");
+            if (Upper)
+                charset.AddRange("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            if (Lower)
+                charset.AddRange("abcdefghijklmnopqrstuvwxyz");
+            if (ExtraSymbols != null)
+                charset.AddRange(ExtraSymbols);
 
-            if (Upper) { rcnt += (byte)26; }
-            if (Lower) { rcnt += (byte)26; }
+            if (charset.Count == 0)
+                throw new ArgumentException("You must enable at least one character group or pass custom symbols.");
 
-            byte rnd = Rand8(--rcnt);
+            // Rejection sampling to remove bias
+            byte rnd;
+            int count = charset.Count;
+            int max = 256 - (256 % count);
 
-            if (Numeric && rnd < 10)
-                return Convert.ToChar(rnd + NUMERIC);
-            else if (Numeric)
-                rnd -= 10;
+            do
+            {
+                rnd = Rand8();
+            } while (rnd >= max);
 
-            if (Upper && rnd < 26)
-                return Convert.ToChar(rnd + UALPHA);
-            else if (Upper)
-                rnd -= 26;
-
-            return Convert.ToChar(rnd + LALPHA);
+            return charset[rnd % count];
         }
+
+
 
         /// <summary>
         /// RandDouble() returns a double between (0.0, 1.0) (non-inclusive)
@@ -646,11 +640,11 @@ namespace Isaac64
             // No NaNs or INF
             if (double.IsNaN(Min) || double.IsNaN(Max) ||
                 double.IsInfinity(Min) || double.IsInfinity(Max))
-                throw new Exception("You cannot use infinities or NaNs for Min or Max!");
+                throw new ArgumentException("You cannot use infinities or NaNs for Min or Max! Use actual numeric double values instead.");
 
             // Both normal or both subnormal required
             if (!(double.IsSubnormal(Min) == double.IsSubnormal(Max)))
-                throw new Exception("You cannot mix subnormal and normal doubles for Min & Max!");
+                throw new ArgumentException("You cannot mix subnormal and normal doubles for Min & Max! Choose both subnormals or both normals.");
 
             // Swap Min, Max if necessary
             // Easier to reason about if we know

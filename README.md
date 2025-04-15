@@ -3,7 +3,11 @@
 
 I'm a big fan of using Isaac64 here and there in my projects, and this one is designed to be super easy to use.
 
-The library is battle-tested for 2+ years in production in gaming, and has been used in a variety of other projects including simulations due to its robust random double support.
+This is a pure C# implementation of the ISAAC64 algorithm, which is a fast, high-quality, and non-cryptographic pseudo-random number generator (PRNG) designed by Bob Jenkins. It is known for its speed and statistical quality, making it suitable for various applications, including simulations, games, and other scenarios where random numbers are needed.
+
+This library is battle-tested for 2+ years in production in gaming, and has been used in a variety of other projects including simulations due to its robust random double support.
+
+No dependencies, no fluff, no nonsense. In fact, you can just drop Rng.cs into your project or cut & paste and it will *just work*.
 
 Note: I would not use this for cryptography. Certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, but ISAAC is not itself advertised as a cryptographic RNG, so use at your own risk for that purpose. Otherwise, I think it is an excellent general purpose PRNG that is standards-compliant.
 

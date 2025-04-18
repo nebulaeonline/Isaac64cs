@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
       <ProductName>Isaac64</ProductName>
-      <Version>1.0.2</Version>
+      <Version>1.0.3</Version>
       <Authors>Robert C. Horvath, III</Authors>
       <Company>Nebulae Foundation, LLC</Company>
       <Description>Fast, deterministic, standards-compliant ISAAC64 RNG implementation in C# with subword extraction, rejection sampling, and IEEE754 double support.</Description>
@@ -20,12 +20,14 @@
     <Title>Isaac64</Title>
     <Copyright>© 2023-2025 Nebulae Foundation, LLC</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <ReadMe>README.md</ReadMe>
     <RepositoryType>git</RepositoryType>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>      
   </PropertyGroup>
 
   <ItemGroup>
     <EditorConfigFiles Remove="J:\coding\github\isaac64\Isaac64cs\.editorconfig" />
+    <None Include="README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

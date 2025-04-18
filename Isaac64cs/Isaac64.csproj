@@ -19,15 +19,14 @@
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <Title>Isaac64</Title>
     <Copyright>© 2023-2025 Nebulae Foundation, LLC</Copyright>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <ReadMe>README.md</ReadMe>
+    <PackageReadmeFile>docs\README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>      
   </PropertyGroup>
 
   <ItemGroup>
     <EditorConfigFiles Remove="J:\coding\github\isaac64\Isaac64cs\.editorconfig" />
-    <None Include="..\README.md" Pack="true" PackagePath="">
+    <None Include="..\README.md" Pack="true" PackagePath="docs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>

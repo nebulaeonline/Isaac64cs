@@ -7,7 +7,7 @@ namespace Isaac64
         // size constants
         private const int ISAAC64_WORD_SZ = 8;
         private const int ISAAC64_SZ_64 = (int)(1 << ISAAC64_WORD_SZ);
-        private const int ISAAC64_SZ_8  = (int)(ISAAC64_SZ_64 << 2);
+        private const int ISAAC64_SZ_8 = (int)(ISAAC64_SZ_64 << 2);
         private const ulong IND_MASK = (ulong)(((ISAAC64_SZ_64) - 1) << 3);
         private const ulong HIGH32 = 0xFFFF_FFFF_0000_0000;
         private const ulong LOW32 = 0x0000_0000_FFFF_FFFF;
@@ -23,7 +23,7 @@ namespace Isaac64
         private static readonly int[] MIX_SHIFT = { 9, 9, 23, 15, 14, 20, 17, 14 };
 
         // state & random data class
-        private class Context
+        public class Context
         {
             // randrsl
             internal ulong[] rng_buf = new ulong[ISAAC64_SZ_64];
@@ -35,11 +35,41 @@ namespace Isaac64
             internal ulong aa, bb, cc;
 
             // randcnt
-            internal int rngbuf_curptr;            
+            internal int rngbuf_curptr;
+
+            // allows to clone the context for simulation
+            // and testing purposes
+            public Context Clone()
+            {
+                return new Context
+                {
+                    aa = this.aa,
+                    bb = this.bb,
+                    cc = this.cc,
+                    rngbuf_curptr = this.rngbuf_curptr,
+                    rng_buf = (ulong[])this.rng_buf.Clone(),
+                    rng_state = (ulong[])this.rng_state.Clone()
+                };
+            }
         }
 
         // create a context
         private Context ctx = new Context();
+
+        /// <summary>
+        /// Clone() clones the internal context of the rng object and returns a new rng object
+        /// This is useful to split the same rng object into multiple rng objects to take
+        /// two different paths, but maintain the same repeatability if using known
+        /// seeds. This is useful for testing & simulation purposes.
+        /// </summary>
+        /// <returns>A newly constructed rng with the same internal state as the instance
+        /// Clone() was called on</returns>
+        public Rng Clone()
+        {
+            var copy = new Rng(true); // testing constructor; does not reseed
+            copy.ctx = this.ctx.Clone(); // manually assign copied context
+            return copy;
+        }
 
         /// <summary>
         /// Rng() constructs the rng object and seeds the rng
@@ -316,9 +346,9 @@ namespace Isaac64
             }
 
             if (!Zero)
-            { 
+            {
                 for (i = 0; i < ISAAC64_SZ_64; i += 8)
-                { 
+                {
                     for (int j = 0; j < 8; j++)
                         x[j] += ctx.rng_state[i + j];
 
@@ -701,7 +731,7 @@ namespace Isaac64
                 else if (Min == 0.0)
                     Min = MinZero;
             }
-                        
+
             Dub mz = new Dub(MinZero);
             Dub d1 = new Dub(Min);
             Dub d2 = new Dub(Max);
@@ -743,7 +773,7 @@ namespace Isaac64
 
                 new_exp = RangedRand32(exp_min, exp_max);
             }
-            
+
             // Work on the fractional part
             ulong frac_min = (ulong)0;
             ulong frac_max = Dub.FRAC_BITS;
@@ -785,7 +815,7 @@ namespace Isaac64
             if (rnd_neg) d |= Dub.SIGN_BIT;
             d |= ((ulong)new_exp << 52);
 
-            return BitConverter.UInt64BitsToDouble(d);            
+            return BitConverter.UInt64BitsToDouble(d);
         }
 
         // Dub - work with doubles
@@ -802,19 +832,19 @@ namespace Isaac64
             private ulong _frac;
 
             public bool IsNeg { get { return _neg; } }
-            public uint Exp { get { return _exp; } }  
+            public uint Exp { get { return _exp; } }
             public bool HasNegExp { get { return (_exp < EXP_BIAS); } }
             public int UnbiasedExp { get { return (int)_exp - EXP_BIAS; } }
             public ulong Frac { get { return _frac; } }
-            
+
             public Dub(double InDub)
             {
                 ulong db = BitConverter.DoubleToUInt64Bits(InDub);
-                
+
                 _neg = (db & SIGN_BIT) != 0;
                 _exp = (uint)(((db & ~SIGN_BIT) & ~FRAC_BITS) >> 52);
                 _frac = (db & FRAC_BITS);
-            }            
+            }
         }
     }
 }

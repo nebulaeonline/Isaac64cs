@@ -11,7 +11,11 @@ No dependencies, no fluff, no nonsense. In fact, you can just drop Rng.cs into y
 
 Note: I would not use this for cryptography. Certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, but ISAAC is not itself advertised as a cryptographic RNG, so use at your own risk for that purpose. Otherwise, I think it is an excellent general purpose PRNG that is standards-compliant.
 
-Latest Update 2025-04-14
+Latest Update 2025-04-17
+
+Added a .Clone() method to the Rng class to allow for easy cloning of the RNG state. Use this if you need to create a copy of the RNG state for parallel processing or other purposes.
+
+Update 2025-04-14
 
 1. Fixed a subtle signed-to-unsigned cast wraparound in the RangedRandNS() set of functions
 2. Fixed error with a 0-seeded Rng  not throwing
@@ -49,6 +53,7 @@ These constructors will throw exceptions if used unseeded (0 or empty arrays), o
 5. `RandDoubleRaw(double Min, double Max, double MinZero = 1e-3)` generates a double in the range (Min, Max) using the MinZero parameter as the defacto smallest number (see source for info)
 6. `Shuffle()` mixes & rotates the data and refills the RNG buffer (occurs automatically at mod 256 runs)
 7. `Reseed()` reseeds the RNG from ground zero at any time; has variants mirroring the class constructors
+8. `Clone()` creates a copy of the current RNG state, allowing you to use the same RNG state in multiple threads or processes without interference.
 
 ### Mimic of System.Random for 32-bit Ints:
 

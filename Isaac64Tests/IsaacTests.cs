@@ -256,5 +256,22 @@ namespace Isaac64.Tests
 
             Assert.True(true); // always pass, just measure
         }
+
+        [Fact]
+        public void ClonedRngProducesIdenticalSequence()
+        {
+            // Arrange
+            var original = new Rng(123456789UL); // any known seed
+            var clone = original.Clone();
+
+            // Act & Assert
+            for (int i = 0; i < 1000; i++)
+            {
+                var oVal = original.Rand64();
+                var cVal = clone.Rand64();
+
+                Assert.Equal(oVal, cVal);
+            }
+        }
     }
 }

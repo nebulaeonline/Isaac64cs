@@ -27,7 +27,9 @@
 
   <ItemGroup>
     <EditorConfigFiles Remove="J:\coding\github\isaac64\Isaac64cs\.editorconfig" />
-    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="..\README.md" Pack="true" PackagePath="">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

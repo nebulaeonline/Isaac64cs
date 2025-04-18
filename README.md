@@ -9,7 +9,7 @@ This library is battle-tested for 2+ years in production in gaming, and has been
 
 No dependencies, no fluff, no nonsense. In fact, you can just drop Rng.cs into your project or cut & paste and it will *just work*.
 
-Note: I would not use this for cryptography. Certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, but ISAAC is not itself advertised as a cryptographic RNG, so use at your own risk for that purpose. Otherwise, I think it is an excellent general purpose PRNG that is standards-compliant.
+Note: I would not use this for cryptography. While it is true that certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, ISAAC operations are not guaranteed to be constant time, and ISAAC is not itself advertised as a cryptographic RNG; use at your own risk for any cryptographic purposes. Otherwise, I think it is an excellent standards-compliant general purpose PRNG.
 
 Latest Update 2025-04-17
 

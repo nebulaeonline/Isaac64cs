@@ -13,7 +13,7 @@ Note: I would not use this for cryptography. Certain constructors *do* seed with
 
 Latest Update 2025-04-17
 
-Added a .Clone() method to the Rng class to allow for easy cloning of the RNG state. Use this if you need to create a copy of the RNG state for parallel processing or other purposes.
+Added a .Clone() method to the Rng class to allow for easy cloning of the RNG state into a new instance. Use this if you need to create a copy of the RNG state for parallel processing or other purposes.
 
 Update 2025-04-14
 
@@ -53,7 +53,7 @@ These constructors will throw exceptions if used unseeded (0 or empty arrays), o
 5. `RandDoubleRaw(double Min, double Max, double MinZero = 1e-3)` generates a double in the range (Min, Max) using the MinZero parameter as the defacto smallest number (see source for info)
 6. `Shuffle()` mixes & rotates the data and refills the RNG buffer (occurs automatically at mod 256 runs)
 7. `Reseed()` reseeds the RNG from ground zero at any time; has variants mirroring the class constructors
-8. `Clone()` creates a copy of the current RNG state, allowing you to use the same RNG state in multiple threads or processes without interference.
+8. `Clone()` returns a new instance of the Rng with a complete clone of the current RNG's state; this allows you to "fork" the RNG and run multiple independent RNGs, all of which will start with identical state from the point of Clone(). Useful for using the same RNG state in multiple functions or threads.
 
 ### Mimic of System.Random for 32-bit Ints:
 

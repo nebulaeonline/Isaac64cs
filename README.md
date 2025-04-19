@@ -13,7 +13,8 @@ Cyptographic Note: While it is true that certain constructors *do* seed with a c
 
 Latest Update 2025-04-19
 
-Backported for Nuget and users of old versions of .NET so they can use the library. Conditional compilation directives are included in the source, so if you rebuild you'll take advantage of the latest Microsoft library functions.
+1. Relicense to MIT
+2. Backported for Nuget and users of old versions of .NET so they can use the library. Conditional compilation directives are included in the source, so if you rebuild you'll take advantage of the latest Microsoft library functions.
 
 Update 2025-04-17
 
@@ -75,7 +76,7 @@ All doubles pull a 64-bit integer for the mantissa/fraction. Regular doubles may
 
 1. Verified against Bob Jenkins' original C reference implementation: [ISAAC64](https://burtleburtle.net/bob/rand/isaacafa.html)
 2. Verified both seeded and unseeded tests (32 & 64-bit) with the Rust core library: [Rust Core Lib](https://docs.rs/rand_isaac/latest/src/rand_isaac/isaac64.rs.html)
-3. Verified with the Zig std library's Isaac64 crypto provider: [Zig Std](https://github.com/ziglang/zig/blob/master/lib/std/rand/Isaac64.zig)
+3. Verified with the Zig std library's Isaac64 crypto provider: [Zig Std](https://ratfactor.com/zig/stdlib-browseable2/rand/Isaac64.zig.html)
 
 ### Building:
 

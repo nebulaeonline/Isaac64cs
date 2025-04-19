@@ -894,7 +894,7 @@ namespace Isaac64
  *     32-bit unsigned ints, both seeded and unseeded (see below).  Also matches Rust's 10k ignore
  *     test and verify on 10,001st 64-bit rng pull with seeded input.
  *     
- * Expected outputs from Zig std library: https://github.com/ziglang/zig/blob/master/lib/std/rand/Isaac64.zig
+ * Expected outputs from Zig std library: https://ratfactor.com/zig/stdlib-browseable2/rand/Isaac64.zig.html
  *   - Zig std code provides the same output as below
  *   
  * Output from this project, with an unitialized seed (matches isaac64.c from Bob Jenkins, Rust core & zig std):

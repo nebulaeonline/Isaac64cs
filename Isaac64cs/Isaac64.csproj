@@ -10,7 +10,7 @@
       <Description>Fast, deterministic, standards-compliant ISAAC64 RNG implementation in C# with subword extraction, rejection sampling, and IEEE754 double support.</Description>
       <PackageProjectUrl>https://github.com/nebulaeonline/Isaac64cs</PackageProjectUrl>
       <RepositoryUrl>https://github.com/nebulaeonline/Isaac64cs</RepositoryUrl>
-      <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+      <PackageLicenseExpression>MIT</PackageLicenseExpression>
       <PackageTags>RNG;ISAAC64;random;entropy;deterministic;simulation</PackageTags>
       <IncludeSymbols>true</IncludeSymbols>
       <IncludeSource>true</IncludeSource>

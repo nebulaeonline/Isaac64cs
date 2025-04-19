@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
       <ProductName>Isaac64</ProductName>
       <Version>1.0.4</Version>
-      <TargetFrameworks>netstandard2.0;net6.0;net8.0;net9.0</TargetFrameworks>
+      <TargetFrameworks>netstandard2.0;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
       <Authors>Robert C. Horvath, III</Authors>
       <Company>Nebulae Foundation, LLC</Company>
       <Description>Fast, deterministic, standards-compliant ISAAC64 RNG implementation in C# with subword extraction, rejection sampling, and IEEE754 double support.</Description>

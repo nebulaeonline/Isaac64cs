@@ -1,4 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace Isaac64
 {
@@ -80,8 +84,15 @@ namespace Isaac64
         public Rng()
         {
             var seed = new byte[ISAAC64_SZ_8];
+#if NET6_0_OR_GREATER
             seed = System.Security.Cryptography.RandomNumberGenerator.GetBytes(ISAAC64_SZ_8);
-            Reseed(seed);
+#else
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(seed);
+            }
+#endif
+                Reseed(seed);
         }
 
         /// <summary>
@@ -619,9 +630,9 @@ namespace Isaac64
         /// <param name="Numeric">bool Numeric -  include numeric characters?</param>
         /// <param name="ExtraSymbols">char[]? ExtraSymbols - any additional symbols? (pass as char array)</param>
         /// <returns>char</returns>
-        public char RandAlphaNum(bool Upper = true, bool Lower = true, bool Numeric = true, char[]? ExtraSymbols = null)
+        public char RandAlphaNum(bool Upper = true, bool Lower = true, bool Numeric = true, char[] ExtraSymbols = null)
         {
-            List<char> charset = new();
+            List<char> charset = new List<char>();
 
             if (Numeric)
                 charset.AddRange("0123456789");
@@ -709,8 +720,12 @@ namespace Isaac64
                 throw new ArgumentException("You cannot use infinities or NaNs for Min or Max! Use actual numeric double values instead.");
 
             // Both normal or both subnormal required
+#if !NET5_0_OR_GREATER
+            if (!(Dub.IsSubnormal(Min) == Dub.IsSubnormal(Max)))
+#else
             if (!(double.IsSubnormal(Min) == double.IsSubnormal(Max)))
-                throw new ArgumentException("You cannot mix subnormal and normal doubles for Min & Max! Choose both subnormals or both normals.");
+#endif
+            throw new ArgumentException("You cannot mix subnormal and normal doubles for Min & Max! Choose both subnormals or both normals.");
 
             // Swap Min, Max if necessary
             // Easier to reason about if we know
@@ -718,7 +733,11 @@ namespace Isaac64
             if (Min > Max) (Min, Max) = (Max, Min);
 
             // Adjust MinZero if dealing with subnormals
+#if !NET5_0_OR_GREATER
+            bool sn = Dub.IsSubnormal(Min);
+#else
             bool sn = double.IsSubnormal(Min);
+#endif
             if (sn) MinZero = +0;
             else
             {
@@ -814,8 +833,11 @@ namespace Isaac64
             ulong d = new_frac;
             if (rnd_neg) d |= Dub.SIGN_BIT;
             d |= ((ulong)new_exp << 52);
-
+#if NET6_0_OR_GREATER
             return BitConverter.UInt64BitsToDouble(d);
+#else
+            return BitConverter.ToDouble(BitConverter.GetBytes(d), 0);
+#endif
         }
 
         // Dub - work with doubles
@@ -837,9 +859,25 @@ namespace Isaac64
             public int UnbiasedExp { get { return (int)_exp - EXP_BIAS; } }
             public ulong Frac { get { return _frac; } }
 
+#if !NET5_0_OR_GREATER
+            public static bool IsSubnormal(double value)
+            {
+                if (value == 0.0) return false;
+
+                ulong bits = BitConverter.ToUInt64(BitConverter.GetBytes(value), 0);
+                uint exponent = (uint)((bits >> 52) & 0x7FF);   // Extract exponent bits
+                ulong mantissa = bits & 0xFFFFFFFFFFFFF;        // Extract mantissa bits
+
+                return exponent == 0 && mantissa != 0;
+            }
+#endif
             public Dub(double InDub)
             {
+#if NET6_0_OR_GREATER
                 ulong db = BitConverter.DoubleToUInt64Bits(InDub);
+#else
+                ulong db = BitConverter.ToUInt64(BitConverter.GetBytes(InDub), 0);
+#endif
 
                 _neg = (db & SIGN_BIT) != 0;
                 _exp = (uint)(((db & ~SIGN_BIT) & ~FRAC_BITS) >> 52);

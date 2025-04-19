@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
       <ProductName>Isaac64</ProductName>
-      <Version>1.0.3</Version>
+      <Version>1.0.4</Version>
+      <TargetFrameworks>netstandard2.0;net6.0;net8.0;net9.0</TargetFrameworks>
       <Authors>Robert C. Horvath, III</Authors>
       <Company>Nebulae Foundation, LLC</Company>
       <Description>Fast, deterministic, standards-compliant ISAAC64 RNG implementation in C# with subword extraction, rejection sampling, and IEEE754 double support.</Description>
@@ -14,8 +15,8 @@
       <IncludeSymbols>true</IncludeSymbols>
       <IncludeSource>true</IncludeSource>
       <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <Title>Isaac64</Title>
     <Copyright>© 2023-2025 Nebulae Foundation, LLC</Copyright>

@@ -11,7 +11,13 @@ No dependencies, no fluff, no nonsense. In fact, you can just drop Rng.cs into y
 
 Cyptographic Note: While it is true that certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, ISAAC operations are not constant time, and ISAAC is not itself advertised as a cryptographically secure RNG.
 
-Latest Update 2025-04-19
+---
+
+Latest Update 2025-04-20
+
+Beating it to death. Went with concurrent stacks and added locks. Should be thread-safe now but a tad bit slower.
+
+Update 2025-04-19
 
 1. Relicense to MIT
 2. Backported for Nuget and users of old versions of .NET so they can use the library. Conditional compilation directives are included in the source, so if you rebuild you'll take advantage of the latest Microsoft library functions.
@@ -28,6 +34,8 @@ Update 2025-04-14
 4. Added interface that mimics System.Random with 32-bit Next() functions
 
 Speed is approx 17.7 seconds in Debug mode for 500M random numbers (Ryzen 3950x).
+
+---
 
 [![NuGet](https://img.shields.io/nuget/v/Isaac64.svg)](https://www.nuget.org/packages/Isaac64)
 

@@ -9,54 +9,52 @@ This library is battle-tested for 2+ years in production in gaming, and has been
 
 No dependencies, no fluff, no nonsense. In fact, you can just drop Rng.cs into your project or cut & paste and it will *just work*.
 
-Cyptographic Note: While it is true that certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, ISAAC operations are not constant time, and ISAAC is not itself advertised as a cryptographically secure RNG.
+Cyptographic Note: While it is true that certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, ISAAC operations are not guaranteed to be constant time in this implementation, and ISAAC is not itself advertised as a cryptographically secure RNG. ISAAC should however be more than secure for most any other use, unless someone can run timing attacks on the same system to dump the rng state. All bets are off with unrestricted physical access.
 
 ---
 
-Latest Update 2025-04-21
+**Latest Update 2025-04-21**
 
-The RangedRandN() and RangedRandNS() function groups now eliminate RNG bias through modulo sampling. Note this may mean that more than one random number is burned per pull.
+1. The RangedRandN() and RangedRandNS() function groups now eliminate RNG bias through modulo sampling. Note this may mean that more than one random number is burned per pull when using these functions.
+2. Added tests for issues in the original bias elimination code which caused infinite loops on ranges of 1 and 2 numbers (now fixed).
+3. Added histogram tests with output, 10M Samples (64 buckets for the ints, 100 buckets for the doubles):
 
-Added tests for issues in the original bias elimination which caused infinite loops on ranges of 1 and 2 numbers (now fixed).
+| Function        | Max Deviation | Min Deviation | Spread             |
+| :-------------- | :----:        | :----:        | :----:             |
+| RangedRand8()   |+0.719%        |-0.606%        | 1.325% (+/- 0.72%) |
+| RangedRand16()  |+0.603%        |-0.541%        | 1.144% (+/- 0.60%) |
+| RangedRand32()  |+0.800%        |-0.552%        | 1.352% (+/- 0.80%) |
+| RangedRand64()  |+0.569%        |-0.689%        | 1.258% (+/- 0.69%) |
+| RangedRand8S()  |+0.544%        |-0.466%        | 1.010% (+/- 0.55%) |
+| RangedRand16S() |+0.705%        |-0.577%        | 1.282% (+/- 0.71%) |
+| RangedRand32S() |+0.615%        |-0.681%        | 1.294% (+/- 0.68%) |
+| RangedRand64S() |+0.544%        |-0.796%        | 1.340% (+/- 0.80%) |
+| RandDouble()    |+0.823%        |-0.749%        | 1.572% (+/- 0.82%) |
+| RandDoubleRaw() |+0.769%        |-0.626%        | 1.395% (+/- 0.77%) |
 
-Added histogram tests with output, 10M Samples (64 buckets for the ints, 100 buckets for the doubles):
+**Excellent distributions all around (Thank you Bob!)**
 
- - RangedRand8():    Max deviation +0.719%, Min deviation -0.606% Spread 1.325% (+/- 0.72%)
- - RangedRand16():   Max deviation +0.603%, Min deviation -0.541% Spread 1.144% (+/- 0.60%)
- - RangedRand32():   Max deviation +0.800%, Min deviation -0.552% Spread 1.352% (+/- 0.80%)
- - RangedRand64():   Max deviation +0.569%, Min deviation -0.689% Spread 1.258% (+/- 0.69%)
-
- - RangedRand8S():   Max deviation +0.544%, Min deviation -0.466% Spread 1.010% (+/- 0.55%)
- - RangedRand16S():  Max deviation +0.705%, Min deviation -0.577% Spread 1.282% (+/- 0.71%)
- - RangedRand32S():  Max deviation +0.615%, Min deviation -0.681% Spread 1.294% (+/- 0.68%)
- - RangedRand64S():  Max deviation +0.544%, Min deviation -0.796% Spread 1.340% (+/- 0.80%)
-
- - RandDouble():     Max deviation +0.823%, Min deviation -0.749% Spread 1.572% (+/- 0.82%)
- - RandDoubleRaw():  Max deviation +0.769%, Min deviation -0.626% Spread 1.395% (+/- 0.77%)
-
-Excellent distributions all around (Thank you Bob!)
-
-Update 2025-04-20
+**Update 2025-04-20**
 
 Beating it to death. Went with concurrent stacks and added locks. Thread-safe now but a tad bit slower.
 
-Update 2025-04-19
+**Update 2025-04-19**
 
 1. Relicense to MIT
 2. Backported for Nuget and users of old versions of .NET so they can use the library. Conditional compilation directives are included in the source, so if you rebuild you'll take advantage of the latest Microsoft library functions.
 
-Update 2025-04-17
+**Update 2025-04-17**
 
 Added a .Clone() method to the Rng class to allow for easy cloning of the RNG state into a new instance. Use this if you need to create a copy of the RNG state for parallel processing or other purposes.
 
-Update 2025-04-14
+**Update 2025-04-14**
 
 1. Fixed a subtle signed-to-unsigned cast wraparound in the RangedRandNS() set of functions
 2. Fixed error with a 0-seeded Rng  not throwing
 3. Added unit tests so users can feel confident in the library
 4. Added interface that mimics System.Random with 32-bit Next() functions
 
-Speed is approx 23.91 seconds in Debug mode for 500M random numbers (Ryzen 3950x).
+Speed is approx 23.91 seconds in Debug mode for 500M random numbers (Ryzen 3950x). Should run significantly faster in Release or AOT configurations.
 
 ---
 

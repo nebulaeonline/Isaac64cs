@@ -21,18 +21,18 @@ Added tests for issues in the original bias elimination which caused infinite lo
 
 Added histogram tests with output, 10M Samples (64 buckets for the ints, 100 buckets for the doubles):
 
-RangedRand8():    Max deviation +0.719%, Min deviation -0.606% Spread 1.325% (+/- 0.72%)
-RangedRand16():   Max deviation +0.603%, Min deviation -0.541% Spread 1.144% (+/- 0.60%)
-RangedRand32():   Max deviation +0.800%, Min deviation -0.552% Spread 1.352% (+/- 0.80%)
-RangedRand64():   Max deviation +0.569%, Min deviation -0.689% Spread 1.258% (+/- 0.69%)
+ - RangedRand8():    Max deviation +0.719%, Min deviation -0.606% Spread 1.325% (+/- 0.72%)
+ - RangedRand16():   Max deviation +0.603%, Min deviation -0.541% Spread 1.144% (+/- 0.60%)
+ - RangedRand32():   Max deviation +0.800%, Min deviation -0.552% Spread 1.352% (+/- 0.80%)
+ - RangedRand64():   Max deviation +0.569%, Min deviation -0.689% Spread 1.258% (+/- 0.69%)
 
-RangedRand8S():   Max deviation +0.544%, Min deviation -0.466% Spread 1.010% (+/- 0.55%)
-RangedRand16S():  Max deviation +0.705%, Min deviation -0.577% Spread 1.282% (+/- 0.71%)
-RangedRand32S():  Max deviation +0.615%, Min deviation -0.681% Spread 1.294% (+/- 0.68%)
-RangedRand64S():  Max deviation +0.544%, Min deviation -0.796% Spread 1.340% (+/- 0.80%)
+ - RangedRand8S():   Max deviation +0.544%, Min deviation -0.466% Spread 1.010% (+/- 0.55%)
+ - RangedRand16S():  Max deviation +0.705%, Min deviation -0.577% Spread 1.282% (+/- 0.71%)
+ - RangedRand32S():  Max deviation +0.615%, Min deviation -0.681% Spread 1.294% (+/- 0.68%)
+ - RangedRand64S():  Max deviation +0.544%, Min deviation -0.796% Spread 1.340% (+/- 0.80%)
 
-RandDouble():     Max deviation +0.823%, Min deviation -0.749% Spread 1.572% (+/- 0.82%)
-RandDoubleRaw():  Max deviation +0.769%, Min deviation -0.626% Spread 1.395% (+/- 0.77%)
+ - RandDouble():     Max deviation +0.823%, Min deviation -0.749% Spread 1.572% (+/- 0.82%)
+ - RandDoubleRaw():  Max deviation +0.769%, Min deviation -0.626% Spread 1.395% (+/- 0.77%)
 
 Excellent distributions all around (Thank you Bob!)
 

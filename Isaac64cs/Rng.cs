@@ -461,12 +461,22 @@ namespace Isaac64
         /// <returns>ulong</returns>
         public ulong RangedRand64(ulong Min, ulong Max)
         {
-            if (Min == Max) { return Min; }
-            if (Max < Min) { (Min, Max) = (Max, Min); }
+            if (Min == Max)
+                return Min;
 
-            var rmax = Max - Min;
-            var r = Rand64(rmax);
-            return r + Min;
+            if (Min > Max)
+                (Min, Max) = (Max, Min);
+
+            ulong range = Max - Min + 1;
+            ulong threshold = ulong.MaxValue - (ulong.MaxValue % range);
+
+            ulong r;
+            do
+            {
+                r = Rand64();
+            } while (r >= threshold);
+
+            return Min + (r % range);
         }
 
         /// <summary>
@@ -477,12 +487,22 @@ namespace Isaac64
         /// <returns>long</returns>
         public long RangedRand64S(long Min, long Max)
         {
-            if (Min == Max) return Min;
-            if (Min > Max) (Min, Max) = (Max, Min);
+            if (Min == Max)
+                return Min;
 
-            ulong range = (ulong)(Max - Min);
-            ulong rand = Rand64(range);
-            return Min + (long)rand;
+            if (Min > Max)
+                (Min, Max) = (Max, Min);
+
+            ulong range = (ulong)(Max - Min + 1);
+            ulong threshold = ulong.MaxValue - (ulong.MaxValue % range);
+
+            ulong r;
+            do
+            {
+                r = Rand64();
+            } while (r >= threshold);
+
+            return Min + (long)(r % range);
         }
 
         /// <summary>
@@ -516,12 +536,22 @@ namespace Isaac64
         /// <returns>uint</returns>
         public uint RangedRand32(uint Min, uint Max)
         {
-            if (Min == Max) { return Min; }
-            if (Max < Min) { (Min, Max) = (Max, Min); }
+            if (Min == Max)
+                return Min;
 
-            uint rmax = Max - Min;
-            uint r = Rand32(rmax);
-            return r + Min;
+            if (Min > Max)
+                (Min, Max) = (Max, Min);
+
+            ulong range = (ulong)(Max - Min + 1);
+            uint threshold = (uint)(uint.MaxValue + 1UL - ((uint.MaxValue + 1UL) % range));
+
+            uint r;
+            do
+            {
+                r = Rand32();
+            } while (r >= threshold);
+
+            return Min + (r % (uint)range);
         }
 
         /// <summary>
@@ -532,12 +562,22 @@ namespace Isaac64
         /// <returns>int</returns>
         public int RangedRand32S(int Min, int Max)
         {
-            if (Min == Max) return Min;
-            if (Min > Max) (Min, Max) = (Max, Min);
+            if (Min == Max)
+                return Min;
 
-            uint range = (uint)(Max - Min);
-            uint rand = Rand32(range);
-            return Min + (int)rand;
+            if (Min > Max)
+                (Min, Max) = (Max, Min);
+
+            ulong range = (ulong)(Max - Min + 1);
+            uint threshold = (uint)(uint.MaxValue + 1UL - ((uint.MaxValue + 1UL) % range));
+
+            uint r;
+            do
+            {
+                r = Rand32();
+            } while (r >= threshold);
+
+            return Min + (int)(r % range);
         }
 
         /// <summary>
@@ -573,12 +613,22 @@ namespace Isaac64
         /// <returns>ushort</returns>
         public ushort RangedRand16(ushort Min, ushort Max)
         {
-            if (Min == Max) { return Min; }
-            if (Max < Min) { (Min, Max) = (Max, Min); }
+            if (Min == Max)
+                return Min;
 
-            ushort rmax = (ushort)(Max - Min);
-            ushort r = Rand16((ushort)rmax);
-            return (ushort)(r + Min);
+            if (Min > Max)
+                (Min, Max) = (Max, Min);
+
+            int range = Max - Min + 1;
+            ushort threshold = (ushort)(ushort.MaxValue + 1 - ((ushort.MaxValue + 1) % range));
+
+            ushort r;
+            do
+            {
+                r = Rand16();
+            } while (r >= threshold);
+
+            return (ushort)(Min + (r % range));
         }
 
         /// <summary>
@@ -589,12 +639,22 @@ namespace Isaac64
         /// <returns>short</returns>
         public short RangedRand16S(short Min, short Max)
         {
-            if (Min == Max) return Min;
-            if (Min > Max) (Min, Max) = (Max, Min);
+            if (Min == Max)
+                return Min;
 
-            ushort range = (ushort)(Max - Min);
-            ushort rand = Rand16(range);
-            return (short)(Min + rand);
+            if (Min > Max)
+                (Min, Max) = (Max, Min);
+
+            int range = Max - Min + 1;
+            ushort threshold = (ushort)(ushort.MaxValue + 1 - ((ushort.MaxValue + 1) % range));
+
+            ushort r;
+            do
+            {
+                r = Rand16();
+            } while (r >= threshold);
+
+            return (short)(Min + (r % range));
         }
 
         /// <summary>
@@ -630,12 +690,19 @@ namespace Isaac64
         /// <returns>byte</returns>
         public byte RangedRand8(byte Min, byte Max)
         {
-            if (Min == Max) { return Min; }
-            if (Max < Min) { (Min, Max) = (Max, Min); }
+            if (Min == Max) return Min;
+            if (Min > Max) (Min, Max) = (Max, Min);
 
-            byte rmax = (byte)(Max - Min);
-            byte r = Rand8(rmax);
-            return (byte)(r + Min);
+            byte range = (byte)(Max - Min + 1);
+            byte threshold = (byte)(256 - (256 % range));
+
+            byte r;
+            do
+            {
+                r = Rand8();
+            } while (r >= threshold);
+
+            return (byte)(Min + (r % range));
         }
 
         /// <summary>
@@ -646,12 +713,22 @@ namespace Isaac64
         /// <returns>sbyte</returns>
         public sbyte RangedRand8S(sbyte Min, sbyte Max)
         {
-            if (Min == Max) return Min;
-            if (Min > Max) (Min, Max) = (Max, Min);
+            if (Min == Max)
+                return Min;
 
-            byte range = (byte)(Max - Min);
-            byte rand = Rand8(range);
-            return (sbyte)(Min + rand);
+            if (Min > Max)
+                (Min, Max) = (Max, Min);
+
+            int range = Max - Min + 1;
+            byte threshold = (byte)(256 - (256 % range));
+
+            byte r;
+            do
+            {
+                r = Rand8(); // bias-free 8-bit pull
+            } while (r >= threshold);
+
+            return (sbyte)(Min + (r % range));
         }
 
 

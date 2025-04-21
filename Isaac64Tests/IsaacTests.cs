@@ -273,5 +273,197 @@ namespace Isaac64.Tests
                 Assert.Equal(oVal, cVal);
             }
         }
+
+        [Fact]
+        public void RangedRand8_HandlesReversedBoundsAndFullRange()
+        {
+            var rng = new Rng(42);
+            for (int i = 0; i < 1000; i++)
+            {
+                byte value = rng.RangedRand8(255, 0);
+                Assert.InRange(value, 0, 255);
+            }
+        }
+
+        [Fact]
+        public void RangedRand8S_HandlesReversedBoundsAndFullRange()
+        {
+            var rng = new Rng(42);
+            for (int i = 0; i < 1000; i++)
+            {
+                sbyte value = rng.RangedRand8S(sbyte.MinValue, sbyte.MaxValue);
+                Assert.InRange(value, -128, 127);
+            }
+        }
+
+        [Fact]
+        public void RangedRand16_HandlesReversedBoundsAndFullRange()
+        {
+            var rng = new Rng(42);
+            for (int i = 0; i < 1000; i++)
+            {
+                ushort value = rng.RangedRand16(ushort.MaxValue, 0);
+                Assert.InRange(value, 0, 65535);
+            }
+        }
+
+        [Fact]
+        public void RangedRand16S_HandlesReversedBoundsAndFullRange()
+        {
+            var rng = new Rng(42);
+            for (int i = 0; i < 1000; i++)
+            {
+                short value = rng.RangedRand16S(short.MinValue, short.MaxValue);
+                Assert.InRange(value, short.MinValue, short.MaxValue);
+            }
+        }
+
+        [Fact]
+        public void RangedRand32_HandlesReversedBoundsAndFullRange()
+        {
+            var rng = new Rng(42);
+            for (int i = 0; i < 1000; i++)
+            {
+                uint value = rng.RangedRand32(uint.MaxValue, 0);
+                Assert.True(value >= 0, $"Out of range: {value}");
+            }
+        }
+
+        [Fact]
+        public void RangedRand32S_HandlesReversedBoundsAndFullRange()
+        {
+            var rng = new Rng(42);
+            for (int i = 0; i < 1000; i++)
+            {
+                int value = rng.RangedRand32S(int.MinValue, int.MaxValue);
+                Assert.InRange(value, int.MinValue, int.MaxValue);
+            }
+        }
+
+        [Fact]
+        public void RangedRand64_HandlesReversedBoundsAndFullRange()
+        {
+            var rng = new Rng(42);
+            for (int i = 0; i < 1000; i++)
+            {
+                ulong value = rng.RangedRand64(ulong.MaxValue, 0);
+                Assert.True(value >= 0, $"Out of range: {value}");
+            }
+        }
+
+        [Fact]
+        public void RangedRand64S_HandlesReversedBoundsAndFullRange()
+        {
+            var rng = new Rng(42);
+            for (int i = 0; i < 1000; i++)
+            {
+                long value = rng.RangedRand64S(long.MinValue, long.MaxValue);
+                Assert.InRange(value, long.MinValue, long.MaxValue);
+            }
+        }
+
+        [Theory]
+        [InlineData((byte)5, (byte)5)]
+        [InlineData((byte)42, (byte)43)]
+        public void RangedRand8_SmallRanges_ProduceValidResults(byte min, byte max)
+        {
+            var rng = new Rng(123);
+            for (int i = 0; i < 100; i++)
+            {
+                byte v = rng.RangedRand8(min, max);
+                Assert.InRange(v, Math.Min(min, max), Math.Max(min, max));
+            }
+        }
+
+        [Theory]
+        [InlineData((sbyte)-10, (sbyte)-10)]
+        [InlineData((sbyte)12, (sbyte)13)]
+        public void RangedRand8S_SmallRanges_ProduceValidResults(sbyte min, sbyte max)
+        {
+            var rng = new Rng(123);
+            for (int i = 0; i < 100; i++)
+            {
+                sbyte v = rng.RangedRand8S(min, max);
+                Assert.InRange(v, Math.Min(min, max), Math.Max(min, max));
+            }
+        }
+
+        [Theory]
+        [InlineData((ushort)1000, (ushort)1000)]
+        [InlineData((ushort)2000, (ushort)2001)]
+        public void RangedRand16_SmallRanges_ProduceValidResults(ushort min, ushort max)
+        {
+            var rng = new Rng(123);
+            for (int i = 0; i < 100; i++)
+            {
+                ushort v = rng.RangedRand16(min, max);
+                Assert.InRange(v, Math.Min(min, max), Math.Max(min, max));
+            }
+        }
+
+        [Theory]
+        [InlineData((short)-12345, (short)-12345)]
+        [InlineData((short)1000, (short)1001)]
+        public void RangedRand16S_SmallRanges_ProduceValidResults(short min, short max)
+        {
+            var rng = new Rng(123);
+            for (int i = 0; i < 100; i++)
+            {
+                short v = rng.RangedRand16S(min, max);
+                Assert.InRange(v, Math.Min(min, max), Math.Max(min, max));
+            }
+        }
+
+        [Theory]
+        [InlineData((uint)99999, (uint)99999)]
+        [InlineData((uint)65535, (uint)65536)]
+        public void RangedRand32_SmallRanges_ProduceValidResults(uint min, uint max)
+        {
+            var rng = new Rng(123);
+            for (int i = 0; i < 100; i++)
+            {
+                uint v = rng.RangedRand32(min, max);
+                Assert.InRange(v, Math.Min(min, max), Math.Max(min, max));
+            }
+        }
+
+        [Theory]
+        [InlineData((int)-50000, (int)-50000)]
+        [InlineData((int)1337, (int)1338)]
+        public void RangedRand32S_SmallRanges_ProduceValidResults(int min, int max)
+        {
+            var rng = new Rng(123);
+            for (int i = 0; i < 100; i++)
+            {
+                int v = rng.RangedRand32S(min, max);
+                Assert.InRange(v, Math.Min(min, max), Math.Max(min, max));
+            }
+        }
+
+        [Theory]
+        [InlineData((ulong)9876543210, (ulong)9876543210)]
+        [InlineData((ulong)1, (ulong)2)]
+        public void RangedRand64_SmallRanges_ProduceValidResults(ulong min, ulong max)
+        {
+            var rng = new Rng(123);
+            for (int i = 0; i < 100; i++)
+            {
+                ulong v = rng.RangedRand64(min, max);
+                Assert.InRange(v, Math.Min(min, max), Math.Max(min, max));
+            }
+        }
+
+        [Theory]
+        [InlineData((long)-9999999999, (long)-9999999999)]
+        [InlineData((long)123456789, (long)123456790)]
+        public void RangedRand64S_SmallRanges_ProduceValidResults(long min, long max)
+        {
+            var rng = new Rng(123);
+            for (int i = 0; i < 100; i++)
+            {
+                long v = rng.RangedRand64S(min, max);
+                Assert.InRange(v, Math.Min(min, max), Math.Max(min, max));
+            }
+        }
     }
 }

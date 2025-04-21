@@ -11,7 +11,7 @@
       <PackageProjectUrl>https://github.com/nebulaeonline/Isaac64cs</PackageProjectUrl>
       <RepositoryUrl>https://github.com/nebulaeonline/Isaac64cs</RepositoryUrl>
       <PackageLicenseExpression>MIT</PackageLicenseExpression>
-      <PackageTags>RNG;ISAAC64;random;entropy;deterministic;simulation</PackageTags>
+      <PackageTags>RNG;ISAAC64;random;entropy;deterministic;simulation;IEEE754;bias elimination;modulo sampling</PackageTags>
       <IncludeSymbols>true</IncludeSymbols>
       <IncludeSource>true</IncludeSource>
       <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

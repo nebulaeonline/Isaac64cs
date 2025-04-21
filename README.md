@@ -15,7 +15,9 @@ Cyptographic Note: While it is true that certain constructors *do* seed with a c
 
 Latest Update 2025-04-21
 
-The RangedRandN() and RangedRandNS() function groups now eliminate RNG bias through modulo sampling. Note this may mean that more than one random number is burned per pull (those that fall outside the range of acceptable values).
+The RangedRandN() and RangedRandNS() function groups now eliminate RNG bias through modulo sampling. Note this may mean that more than one random number is burned per pull.
+
+Added tests for some issues the bias elimination introduced (fixed).
 
 Update 2025-04-20
 

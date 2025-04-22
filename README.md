@@ -9,7 +9,9 @@ This library is battle-tested for 2+ years in production in gaming, and has been
 
 No dependencies, no fluff, no nonsense. In fact, you can just drop Rng.cs into your project or cut & paste and it will *just work*.
 
-Cyptographic Note: While it is true that certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, ISAAC operations are not guaranteed to be constant time in this implementation, and ISAAC is not itself advertised as a cryptographically secure RNG. ISAAC should however be more than secure for most any other use, unless someone can run timing attacks on the same system to dump the rng state. All bets are off with unrestricted physical access.
+Cyptographic Note: While it is true that certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, ISAAC operations are not guaranteed to be constant time in this implementation, and ISAAC is not itself advertised as a cryptographically secure RNG. ISAAC should however be more than secure for most any other use.
+
+**Speed:** approx 23.91 seconds in Debug for 500M random numbers (Ryzen 3950x). 8.3 seconds in Release (~60M 64-bit values per second). Should run even faster with AOT compilation.
 
 ---
 
@@ -53,8 +55,6 @@ Added a .Clone() method to the Rng class to allow for easy cloning of the RNG st
 2. Fixed error with a 0-seeded Rng  not throwing
 3. Added unit tests so users can feel confident in the library
 4. Added interface that mimics System.Random with 32-bit Next() functions
-
-Speed is approx 23.91 seconds in Debug mode for 500M random numbers (Ryzen 3950x). Should run significantly faster in Release or AOT configurations.
 
 ---
 

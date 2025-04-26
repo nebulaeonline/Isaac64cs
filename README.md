@@ -19,7 +19,7 @@ Cyptographic Note: While it is true that certain constructors *do* seed with a c
 
 1. The RangedRandN() and RangedRandNS() function groups now eliminate RNG bias through modulo sampling. Note this may mean that more than one random number is burned per pull when using these functions.
 2. Added tests for issues in the original bias elimination code which caused infinite loops on ranges of 1 and 2 numbers (now fixed).
-3. Added histogram tests with output, 10M Samples (64 buckets for the ints, 100 buckets for the doubles):
+3. Added uniformity tests with bucket output, 10M Samples (64 buckets for the ints, 100 buckets for the doubles):
 
 | Function        | Max Deviation | Min Deviation | Spread             |
 | :-------------- | :----:        | :----:        | :----:             |

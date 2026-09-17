@@ -174,6 +174,9 @@ namespace Isaac64
         {
             lock (_lock)
             {
+                if (Seedbytes == null)
+                    throw new ArgumentNullException(nameof(Seedbytes));
+
                 if (!IgnoreZeroAndOverSZ8Bytes && (Seedbytes.Length > ISAAC64_SZ_8 || Seedbytes.Length == 0))
                     throw new ArgumentException($"Cannot seed ISAAC64 with zero or more than {ISAAC64_SZ_8} bytes! To pass a zero array size or an array size > {ISAAC64_SZ_8}, set IgnoreZeroAndOverSZ8Bytes to true.");
 
@@ -206,6 +209,9 @@ namespace Isaac64
         {
             lock (_lock)
             {
+                if (SeedULongs == null)
+                    throw new ArgumentNullException(nameof(SeedULongs));
+
                 if (!IgnoreZeroAndOverSZ64Longs && (SeedULongs.Length > ISAAC64_SZ_64 || SeedULongs.Length == 0))
                     throw new ArgumentException($"Cannot seed ISAAC64 with zero or more than {ISAAC64_SZ_64} ulongs! To pass a zero array size or an array size > {ISAAC64_SZ_64}, set IgnoreZeroAndOverSZ64Longs to true.");
 
@@ -245,7 +251,13 @@ namespace Isaac64
         // clear the rng state
         private void clear_state()
         {
-            for (int i = 0; i < ISAAC64_SZ_64; i++) ctx.rng_state[i] = (ulong)0;
+            Array.Clear(ctx.rng_buf, 0, ctx.rng_buf.Length);
+            Array.Clear(ctx.rng_state, 0, ctx.rng_state.Length);
+            banked32.Clear();
+            banked16.Clear();
+            banked8.Clear();
+            ctx.rngbuf_curptr = 0;
+            ctx.aa = ctx.bb = ctx.cc = 0;
         }
 
         // sets the curptr in the rng_buf back to max
@@ -426,7 +438,7 @@ namespace Isaac64
         public int Next(int min, int max)
         {
             if (min > max)
-                (max, min) = (min, max);
+                throw new ArgumentOutOfRangeException(nameof(min), "min must be less than or equal to max");
 
             if (min == max)
                 return min;
@@ -553,7 +565,7 @@ namespace Isaac64
             if (Min == Max) return Min;
             if (Min > Max) (Min, Max) = (Max, Min);
 
-            ulong range = (ulong)(Max - Min) + 1;
+            ulong range = (ulong)((long)Max - Min) + 1;
             if (range == 0) return (int)Rand32();
 
             ulong threshold = (1UL << 32) - ((1UL << 32) % range);
@@ -733,17 +745,7 @@ namespace Isaac64
             if (charset.Count == 0)
                 throw new ArgumentException("You must enable at least one character group or pass custom symbols.");
 
-            // Rejection sampling to remove bias
-            byte rnd;
-            int count = charset.Count;
-            int max = 256 - (256 % count);
-
-            do
-            {
-                rnd = Rand8();
-            } while (rnd >= max);
-
-            return charset[rnd % count];
+            return charset[(int)RangedRand32(0, (uint)charset.Count - 1)];
         }
 
 

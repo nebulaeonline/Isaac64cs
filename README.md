@@ -9,7 +9,7 @@ This library is battle-tested for 2+ years in production in gaming, and has been
 
 No dependencies, no fluff, no nonsense. In fact, you can just drop Rng.cs into your project or cut & paste and it will *just work*.
 
-Cyptographic Note: While it is true that certain constructors *do* seed with a crypographically secure 2048-byte seed from the system RNG, ISAAC operations are not guaranteed to be constant time in this implementation. ISAAC is itself advertised as a cryptographic RNG, but that term means something different than when this code was published with respect to side channel attacks. ISAAC should however be more than secure for most any other use.
+Cryptographic note: The default constructor uses a cryptographically secure system RNG only to seed this non-cryptographic PRNG. Do not use this library for secrets, keys, tokens, or other security-sensitive decisions. ISAAC operations are not guaranteed to be constant time.
 
 **Speed:** approx 23.91 seconds in Debug for 500M random numbers (Ryzen 3950x). 8.3 seconds in Release (~60M 64-bit values per second). Should run even faster with AOT compilation.
 
@@ -91,9 +91,9 @@ These constructors will throw exceptions if used unseeded (0 or empty arrays), o
 
 ### Mimic of System.Random for 32-bit Ints:
 
-1. `Next()`: returns a 32-bit unsigned integer in the range [0, 2^32)
-2. `Next(int Max)`: returns a 32-bit unsigned integer in the range [0, Max)
-3. `Next(int Min, int Max)`: returns a 32-bit unsigned integer in the range [Min, Max)
+1. `Next()`: returns a non-negative 32-bit integer
+2. `Next(int Max)`: returns a non-negative integer in the range [0, Max)
+3. `Next(int Min, int Max)`: returns an integer in the range [Min, Max), and throws if Min > Max
 
 When pulling a data type smaller than 64-bits, the remaining bytes of the 8-byte chunk are banked until you request that same type size again.
 

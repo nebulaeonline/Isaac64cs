@@ -83,6 +83,13 @@ namespace Isaac64.Tests
         }
 
         [Fact]
+        public void Next_ThrowsWhenMinimumExceedsMaximum()
+        {
+            var rng = new Rng(42);
+            Assert.Throws<ArgumentOutOfRangeException>(() => rng.Next(10, 5));
+        }
+
+        [Fact]
         public void Rng_Throws_OnOversizedByteArray()
         {
             byte[] bytes = new byte[3000]; // >2048
@@ -104,6 +111,21 @@ namespace Isaac64.Tests
             rng.Reseed(888);
             ulong after = rng.Rand64(ulong.MaxValue);
             Assert.NotEqual(before, after);
+        }
+
+        [Fact]
+        public void Rng_Reseed_RestoresTheSequenceAfterSubwordReads()
+        {
+            var rng = new Rng(123456789UL);
+            var expected = new Rng(123456789UL);
+
+            _ = rng.Rand8();
+            _ = rng.Rand16();
+            _ = rng.Rand32();
+            rng.Reseed(123456789UL);
+
+            for (int i = 0; i < 16; i++)
+                Assert.Equal(expected.Rand64(), rng.Rand64());
         }
 
         [Fact]
@@ -338,6 +360,27 @@ namespace Isaac64.Tests
                 int value = rng.RangedRand32S(int.MinValue, int.MaxValue);
                 Assert.InRange(value, int.MinValue, int.MaxValue);
             }
+        }
+
+        [Fact]
+        public void RangedRand32S_WideRangeStaysWithinBounds()
+        {
+            var rng = new Rng(42);
+            for (int i = 0; i < 10_000; i++)
+            {
+                int value = rng.RangedRand32S(-2_000_000_000, 2_000_000_000);
+                Assert.InRange(value, -2_000_000_000, 2_000_000_000);
+            }
+        }
+
+        [Fact]
+        public void RandAlphaNum_SupportsMoreThan256Symbols()
+        {
+            var rng = new Rng(42);
+            var symbols = Enumerable.Range(0, 65_000).Select(i => (char)i).ToArray();
+
+            for (int i = 0; i < 100; i++)
+                Assert.Contains(rng.RandAlphaNum(false, false, false, symbols), symbols);
         }
 
         [Fact]

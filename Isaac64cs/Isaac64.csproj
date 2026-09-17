@@ -2,7 +2,7 @@
 
   <PropertyGroup>
       <ProductName>Isaac64</ProductName>
-      <Version>1.1.0</Version>
+      <Version>1.2.0</Version>
       <TargetFrameworks>netstandard2.0;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
       <Authors>Robert C. Horvath, III</Authors>
       <Company>Nebulae Foundation, LLC</Company>
@@ -18,7 +18,7 @@
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <Title>Isaac64</Title>
-    <Copyright>© 2023-2025 Nebulae Foundation, LLC</Copyright>
+    <Copyright>© 2023-2026 Nebulae Foundation, LLC</Copyright>
     <PackageReadmeFile>docs\README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>      
